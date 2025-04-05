@@ -1,0 +1,1907 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <link rel="stylesheet" href="css/filter.css">
+<link rel="stylesheet" href="css/nouislider.min.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="js/tailDT.js"></script>
+<script src="js/nouislider.min.js"></script>
+<script src="js/wNumb.js"></script>
+        <script src="data/EPCItoutesactivits_0.js"></script>
+        <script src="data/REGION_1.js"></script>
+        <script src="data/DEPARTEMENT_2.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+            highlightLayer.openPopup();
+        }
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[38.238063428039304,-12.47881137743111],[53.670584439497134,19.914919278425405]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        function pop_EPCItoutesactivits_0(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CODE_SIREN'] !== null ? autolinker.link(String(feature.properties['CODE_SIREN']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>NOM</strong><br />' + (feature.properties['NOM'] !== null ? autolinker.link(String(feature.properties['NOM']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NATURE'] !== null ? autolinker.link(String(feature.properties['NATURE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>EPCI-16-09-2024-all — Feuil1_passages</strong><br />' + (feature.properties['EPCI-16-09-2024-all — Feuil1_passages'] !== null ? autolinker.link(String(feature.properties['EPCI-16-09-2024-all — Feuil1_passages']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['EPCI-16-09-2024-all — Feuil1_pratiquants'] !== null ? autolinker.link(String(feature.properties['EPCI-16-09-2024-all — Feuil1_pratiquants']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_EPCItoutesactivits_0_0(feature) {
+            if (feature.properties['EPCI-16-09-2024-all — Feuil1_passages'] >= 150.000000 && feature.properties['EPCI-16-09-2024-all — Feuil1_passages'] <= 1000.000000 ) {
+                return {
+                pane: 'pane_EPCItoutesactivits_0',
+                opacity: 1,
+                color: 'rgba(5,5,5,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(218,217,228,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['EPCI-16-09-2024-all — Feuil1_passages'] >= 1000.000000 && feature.properties['EPCI-16-09-2024-all — Feuil1_passages'] <= 5000.000000 ) {
+                return {
+                pane: 'pane_EPCItoutesactivits_0',
+                opacity: 1,
+                color: 'rgba(5,5,5,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(162,159,188,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['EPCI-16-09-2024-all — Feuil1_passages'] >= 5000.000000 && feature.properties['EPCI-16-09-2024-all — Feuil1_passages'] <= 15000.000000 ) {
+                return {
+                pane: 'pane_EPCItoutesactivits_0',
+                opacity: 1,
+                color: 'rgba(5,5,5,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(105,101,148,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['EPCI-16-09-2024-all — Feuil1_passages'] >= 15000.000000 && feature.properties['EPCI-16-09-2024-all — Feuil1_passages'] <= 800000.000000 ) {
+                return {
+                pane: 'pane_EPCItoutesactivits_0',
+                opacity: 1,
+                color: 'rgba(5,5,5,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(49,43,108,1.0)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_EPCItoutesactivits_0');
+        map.getPane('pane_EPCItoutesactivits_0').style.zIndex = 400;
+        map.getPane('pane_EPCItoutesactivits_0').style['mix-blend-mode'] = 'normal';
+        var layer_EPCItoutesactivits_0 = new L.geoJson(json_EPCItoutesactivits_0, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_EPCItoutesactivits_0',
+            layerName: 'layer_EPCItoutesactivits_0',
+            pane: 'pane_EPCItoutesactivits_0',
+            onEachFeature: pop_EPCItoutesactivits_0,
+            style: style_EPCItoutesactivits_0_0,
+        });
+        bounds_group.addLayer(layer_EPCItoutesactivits_0);
+        map.addLayer(layer_EPCItoutesactivits_0);
+        function pop_REGION_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM_M'] !== null ? autolinker.link(String(feature.properties['NOM_M']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM'] !== null ? autolinker.link(String(feature.properties['NOM']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_REG'] !== null ? autolinker.link(String(feature.properties['INSEE_REG']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_REGION_1_0() {
+            return {
+                pane: 'pane_REGION_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(125,139,143,0.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_REGION_1');
+        map.getPane('pane_REGION_1').style.zIndex = 401;
+        map.getPane('pane_REGION_1').style['mix-blend-mode'] = 'normal';
+        var layer_REGION_1 = new L.geoJson(json_REGION_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_REGION_1',
+            layerName: 'layer_REGION_1',
+            pane: 'pane_REGION_1',
+            onEachFeature: pop_REGION_1,
+            style: style_REGION_1_0,
+        });
+        bounds_group.addLayer(layer_REGION_1);
+        map.addLayer(layer_REGION_1);
+        function pop_DEPARTEMENT_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM_M'] !== null ? autolinker.link(String(feature.properties['NOM_M']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM'] !== null ? autolinker.link(String(feature.properties['NOM']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_DEP'] !== null ? autolinker.link(String(feature.properties['INSEE_DEP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INSEE_REG'] !== null ? autolinker.link(String(feature.properties['INSEE_REG']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_DEPARTEMENT_2_0() {
+            return {
+                pane: 'pane_DEPARTEMENT_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1, 
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_DEPARTEMENT_2');
+        map.getPane('pane_DEPARTEMENT_2').style.zIndex = 402;
+        map.getPane('pane_DEPARTEMENT_2').style['mix-blend-mode'] = 'normal';
+        var layer_DEPARTEMENT_2 = new L.geoJson(json_DEPARTEMENT_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_DEPARTEMENT_2',
+            layerName: 'layer_DEPARTEMENT_2',
+            pane: 'pane_DEPARTEMENT_2',
+            onEachFeature: pop_DEPARTEMENT_2,
+            style: style_DEPARTEMENT_2_0,
+        });
+        bounds_group.addLayer(layer_DEPARTEMENT_2);
+        map.addLayer(layer_DEPARTEMENT_2);
+        setBounds();
+        map.addControl(new L.Control.Search({
+            layer: layer_EPCItoutesactivits_0,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'NOM'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-binoculars';
+        var mapDiv = document.getElementById('map');
+        var row = document.createElement('div');
+        row.className="row";
+        row.id="all";
+        row.style.height = "100%";
+        var col1 = document.createElement('div');
+        col1.className="col9";
+        col1.id = "mapWindow";
+        col1.style.height = "99%";
+        col1.style.width = "80%";
+        col1.style.display = "inline-block";
+        var col2 = document.createElement('div');
+        col2.className="col3";
+        col2.id = "menu";
+        col2.style.display = "inline-block";
+        mapDiv.parentNode.insertBefore(row, mapDiv);
+        document.getElementById("all").appendChild(col1);
+        document.getElementById("all").appendChild(col2);
+        col1.appendChild(mapDiv)
+        var Filters = {"EPCI-16-09-2024-all — Feuil1_passages": "int","NOM": "str"};
+        function filterFunc() {
+          map.eachLayer(function(lyr){
+          if ("options" in lyr && "dataVar" in lyr["options"]){
+            features = this[lyr["options"]["dataVar"]].features.slice(0);
+            try{
+              for (key in Filters){
+                keyS = key.replace(/[^a-zA-Z0-9_]/g, "")
+                if (Filters[key] == "str" || Filters[key] == "bool"){
+                  var selection = [];
+                  var options = document.getElementById("sel_" + keyS).options
+                  for (var i=0; i < options.length; i++) {
+                    if (options[i].selected) selection.push(options[i].value);
+                  }
+                    try{
+                      if (key in features[0].properties){
+                        for (i = features.length - 1;
+                          i >= 0; --i){
+                          if (selection.indexOf(
+                          features[i].properties[key])<0
+                          && selection.length>0) {
+                          features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                  }
+                }
+                if (Filters[key] == "int"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (parseInt(features[i].properties[key])
+                          < sliderVals[0]
+                          || parseInt(features[i].properties[key])
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "real"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (features[i].properties[key]
+                          < sliderVals[0]
+                          || features[i].properties[key]
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "date"
+                  || Filters[key] == "datetime"
+                  || Filters[key] == "time"){
+                  try{
+                    if (key in features[0].properties){
+                      HTMLkey = key.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, '');
+                      startdate = document.getElementById("dat_" +
+                        HTMLkey + "_date1").value.replace(" ", "T");
+                      enddate = document.getElementById("dat_" +
+                        HTMLkey + "_date2").value.replace(" ", "T");
+                      for (i = features.length - 1; i >= 0; --i){
+                        if (features[i].properties[key] < startdate
+                          || features[i].properties[key] > enddate){
+                          features.splice(i,1);
+                        }
+                      }
+                    }
+                  } catch(err){
+                  }
+                }
+              }
+            } catch(err){
+            }
+          this[lyr["options"]["layerName"]].clearLayers();
+          this[lyr["options"]["layerName"]].addData(features);
+          }
+          })
+        }
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_EPCI16092024allFeuil1_passages = document.createElement("div");
+            div_EPCI16092024allFeuil1_passages.id = "div_EPCI16092024allFeuil1_passages";
+            div_EPCI16092024allFeuil1_passages.className = "slider";
+            document.getElementById("menu").appendChild(div_EPCI16092024allFeuil1_passages);
+            var lab_EPCI16092024allFeuil1_passages = document.createElement('div');
+            lab_EPCI16092024allFeuil1_passages.innerHTML  = 'EPCI-16-09-2024-all — Feuil1_passages: <span id="val_EPCI16092024allFeuil1_passages"></span>';
+            lab_EPCI16092024allFeuil1_passages.className = 'filterlabel';
+            document.getElementById("menu").appendChild(lab_EPCI16092024allFeuil1_passages);
+            var reset_EPCI16092024allFeuil1_passages = document.createElement('div');
+            reset_EPCI16092024allFeuil1_passages.innerHTML = 'clear filter';
+            reset_EPCI16092024allFeuil1_passages.className = 'filterlabel';
+            lab_EPCI16092024allFeuil1_passages.className = 'filterlabel';
+            reset_EPCI16092024allFeuil1_passages.onclick = function() {
+                sel_EPCI16092024allFeuil1_passages.noUiSlider.reset();
+            };
+            document.getElementById("menu").appendChild(reset_EPCI16092024allFeuil1_passages);
+            var sel_EPCI16092024allFeuil1_passages = document.getElementById('div_EPCI16092024allFeuil1_passages');
+            noUiSlider.create(sel_EPCI16092024allFeuil1_passages, {
+                connect: true,
+                start: [176, 669552],
+                step: 1,
+                format: wNumb({
+                    decimals: 0,
+                    }),
+                range: {
+                min: 176,
+                max: 669552
+                }
+            });
+            sel_EPCI16092024allFeuil1_passages.noUiSlider.on('update', function (values) {
+            filterVals =[];
+            for (value in values){
+            filterVals.push(parseInt(value))
+            }
+            val_EPCI16092024allFeuil1_passages = document.getElementById('val_EPCI16092024allFeuil1_passages');
+            val_EPCI16092024allFeuil1_passages.innerHTML = values.join(' - ');
+                filterFunc()
+            });
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_NOM = document.createElement('div');
+            div_NOM.id = "div_NOM";
+            div_NOM.className= "filterselect";
+            document.getElementById("menu").appendChild(div_NOM);
+            sel_NOM = document.createElement('select');
+            sel_NOM.multiple = true;
+            sel_NOM.size = 10;
+            sel_NOM.id = "sel_NOM";
+            var NOM_options_str = "<option value='' unselected></option>";
+            sel_NOM.onchange = function(){filterFunc()};
+            NOM_options_str  += '<option value="Ain">Ain</option>';
+            NOM_options_str  += '<option value="Aisne">Aisne</option>';
+            NOM_options_str  += '<option value="Allier">Allier</option>';
+            NOM_options_str  += '<option value="Alpes-Maritimes">Alpes-Maritimes</option>';
+            NOM_options_str  += '<option value="Alpes-de-Haute-Provence">Alpes-de-Haute-Provence</option>';
+            NOM_options_str  += '<option value="Ardennes">Ardennes</option>';
+            NOM_options_str  += '<option value="Ardèche">Ardèche</option>';
+            NOM_options_str  += '<option value="Ariège">Ariège</option>';
+            NOM_options_str  += '<option value="Aube">Aube</option>';
+            NOM_options_str  += '<option value="Aude">Aude</option>';
+            NOM_options_str  += '<option value="Auvergne-Rhône-Alpes">Auvergne-Rhône-Alpes</option>';
+            NOM_options_str  += '<option value="Aveyron">Aveyron</option>';
+            NOM_options_str  += '<option value="Bas-Rhin">Bas-Rhin</option>';
+            NOM_options_str  += '<option value="Bordeaux Métropole">Bordeaux Métropole</option>';
+            NOM_options_str  += '<option value="Bouches-du-Rhône">Bouches-du-Rhône</option>';
+            NOM_options_str  += '<option value="Boucle Nord de Seine">Boucle Nord de Seine</option>';
+            NOM_options_str  += '<option value="Bourgogne-Franche-Comté">Bourgogne-Franche-Comté</option>';
+            NOM_options_str  += '<option value="Brest Métropole">Brest Métropole</option>';
+            NOM_options_str  += '<option value="Bretagne">Bretagne</option>';
+            NOM_options_str  += '<option value="CA Agglo Pays d&apos;Issoire">CA Agglo Pays d&apos;Issoire</option>';
+            NOM_options_str  += '<option value="CA Agglo du Pays de Dreux">CA Agglo du Pays de Dreux</option>';
+            NOM_options_str  += '<option value="CA Agglomération d&apos;Agen">CA Agglomération d&apos;Agen</option>';
+            NOM_options_str  += '<option value="CA Alès Agglomération">CA Alès Agglomération</option>';
+            NOM_options_str  += '<option value="CA Amiens Métropole">CA Amiens Métropole</option>';
+            NOM_options_str  += '<option value="CA Annemasse-Les Voirons-Agglomération">CA Annemasse-Les Voirons-Agglomération</option>';
+            NOM_options_str  += '<option value="CA Annonay Rhône Agglo">CA Annonay Rhône Agglo</option>';
+            NOM_options_str  += '<option value="CA Arche Agglo">CA Arche Agglo</option>';
+            NOM_options_str  += '<option value="CA Ardenne Métropole">CA Ardenne Métropole</option>';
+            NOM_options_str  += '<option value="CA Arlysère">CA Arlysère</option>';
+            NOM_options_str  += '<option value="CA Bassin d&apos;Arcachon Sud (COBAS)">CA Bassin d&apos;Arcachon Sud (COBAS)</option>';
+            NOM_options_str  += '<option value="CA Beaune, Côte et Sud - Communauté Beaune-Chagny-Nolay">CA Beaune, Côte et Sud - Communauté Beaune-Chagny-Nolay</option>';
+            NOM_options_str  += '<option value="CA Bergeracoise">CA Bergeracoise</option>';
+            NOM_options_str  += '<option value="CA Bourges Plus">CA Bourges Plus</option>';
+            NOM_options_str  += '<option value="CA CIVIS (Communauté Intercommunale des Villes Solidaires)">CA CIVIS (Communauté Intercommunale des Villes Solidaires)</option>';
+            NOM_options_str  += '<option value="CA Cannes Pays de Lérins">CA Cannes Pays de Lérins</option>';
+            NOM_options_str  += '<option value="CA Cap Excellence">CA Cap Excellence</option>';
+            NOM_options_str  += '<option value="CA Carcassonne Agglo">CA Carcassonne Agglo</option>';
+            NOM_options_str  += '<option value="CA Caux Seine Agglo">CA Caux Seine Agglo</option>';
+            NOM_options_str  += '<option value="CA Chartres Métropole">CA Chartres Métropole</option>';
+            NOM_options_str  += '<option value="CA Chauny-Tergnier-La Fère">CA Chauny-Tergnier-La Fère</option>';
+            NOM_options_str  += '<option value="CA Cholet Agglomération">CA Cholet Agglomération</option>';
+            NOM_options_str  += '<option value="CA Châteauroux Métropole">CA Châteauroux Métropole</option>';
+            NOM_options_str  += '<option value="CA Clisson Sèvre et Maine Agglo">CA Clisson Sèvre et Maine Agglo</option>';
+            NOM_options_str  += '<option value="CA Colmar Agglomération">CA Colmar Agglomération</option>';
+            NOM_options_str  += '<option value="CA Communauté Paris-Saclay">CA Communauté Paris-Saclay</option>';
+            NOM_options_str  += '<option value="CA Concarneau Cornouaille Agglomération">CA Concarneau Cornouaille Agglomération</option>';
+            NOM_options_str  += '<option value="CA Coulommiers Pays de Brie">CA Coulommiers Pays de Brie</option>';
+            NOM_options_str  += '<option value="CA Creil Sud Oise">CA Creil Sud Oise</option>';
+            NOM_options_str  += '<option value="CA Cœur d&apos;Essonne Agglomération">CA Cœur d&apos;Essonne Agglomération</option>';
+            NOM_options_str  += '<option value="CA Dinan Agglomération">CA Dinan Agglomération</option>';
+            NOM_options_str  += '<option value="CA Douaisis Agglo">CA Douaisis Agglo</option>';
+            NOM_options_str  += '<option value="CA Dracénie Provence Verdon Agglomération">CA Dracénie Provence Verdon Agglomération</option>';
+            NOM_options_str  += '<option value="CA Durance-Lubéron-Verdon Agglomération">CA Durance-Lubéron-Verdon Agglomération</option>';
+            NOM_options_str  += '<option value="CA ECLA  (Espace Communautaire Lons Agglomération)">CA ECLA  (Espace Communautaire Lons Agglomération)</option>';
+            NOM_options_str  += '<option value="CA Estérel Côte d&apos;Azur Agglomération">CA Estérel Côte d&apos;Azur Agglomération</option>';
+            NOM_options_str  += '<option value="CA Evreux Portes de Normandie">CA Evreux Portes de Normandie</option>';
+            NOM_options_str  += '<option value="CA Flers Agglo">CA Flers Agglo</option>';
+            NOM_options_str  += '<option value="CA Fougères Agglomération">CA Fougères Agglomération</option>';
+            NOM_options_str  += '<option value="CA Fécamp Caux Littoral Agglomération">CA Fécamp Caux Littoral Agglomération</option>';
+            NOM_options_str  += '<option value="CA Gaillac-Graulhet">CA Gaillac-Graulhet</option>';
+            NOM_options_str  += '<option value="CA Gap-Tallard-Durance">CA Gap-Tallard-Durance</option>';
+            NOM_options_str  += '<option value="CA Golfe du Morbihan - Vannes Agglomération">CA Golfe du Morbihan - Vannes Agglomération</option>';
+            NOM_options_str  += '<option value="CA Grand Auch Cœur de Gascogne">CA Grand Auch Cœur de Gascogne</option>';
+            NOM_options_str  += '<option value="CA Grand Belfort">CA Grand Belfort</option>';
+            NOM_options_str  += '<option value="CA Grand Calais Terres et Mers">CA Grand Calais Terres et Mers</option>';
+            NOM_options_str  += '<option value="CA Grand Châtellerault">CA Grand Châtellerault</option>';
+            NOM_options_str  += '<option value="CA Grand Lac">CA Grand Lac</option>';
+            NOM_options_str  += '<option value="CA Grand Longwy Agglomération">CA Grand Longwy Agglomération</option>';
+            NOM_options_str  += '<option value="CA Grand Montauban">CA Grand Montauban</option>';
+            NOM_options_str  += '<option value="CA Grand Paris Sud Seine Essonne Sénart">CA Grand Paris Sud Seine Essonne Sénart</option>';
+            NOM_options_str  += '<option value="CA Grand Sud Caraïbe">CA Grand Sud Caraïbe</option>';
+            NOM_options_str  += '<option value="CA GrandSoissons Agglomération">CA GrandSoissons Agglomération</option>';
+            NOM_options_str  += '<option value="CA Guingamp-Paimpol Agglomération de l&apos;Armor à l&apos;Argoat">CA Guingamp-Paimpol Agglomération de l&apos;Armor à l&apos;Argoat</option>';
+            NOM_options_str  += '<option value="CA Haut - Bugey Agglomération">CA Haut - Bugey Agglomération</option>';
+            NOM_options_str  += '<option value="CA Hérault-Méditerranée">CA Hérault-Méditerranée</option>';
+            NOM_options_str  += '<option value="CA Intercommunale de la Réunion Est (CIREST)">CA Intercommunale de la Réunion Est (CIREST)</option>';
+            NOM_options_str  += '<option value="CA Intercommunale du Nord de la Réunion (CINOR)">CA Intercommunale du Nord de la Réunion (CINOR)</option>';
+            NOM_options_str  += '<option value="CA L&apos; Agglo Foix-Varilhes">CA L&apos; Agglo Foix-Varilhes</option>';
+            NOM_options_str  += '<option value="CA La Riviera du Levant">CA La Riviera du Levant</option>';
+            NOM_options_str  += '<option value="CA La Roche-sur-Yon Agglomération">CA La Roche-sur-Yon Agglomération</option>';
+            NOM_options_str  += '<option value="CA Lamballe Terre et Mer">CA Lamballe Terre et Mer</option>';
+            NOM_options_str  += '<option value="CA Lannion-Trégor Communauté">CA Lannion-Trégor Communauté</option>';
+            NOM_options_str  += '<option value="CA Laval Agglomération">CA Laval Agglomération</option>';
+            NOM_options_str  += '<option value="CA Le Grand Chalon">CA Le Grand Chalon</option>';
+            NOM_options_str  += '<option value="CA Le Grand Narbonne">CA Le Grand Narbonne</option>';
+            NOM_options_str  += '<option value="CA Le Grand Périgueux">CA Le Grand Périgueux</option>';
+            NOM_options_str  += '<option value="CA Le Muretain Agglo">CA Le Muretain Agglo</option>';
+            NOM_options_str  += '<option value="CA Les Sables d&apos;Olonne Agglomération">CA Les Sables d&apos;Olonne Agglomération</option>';
+            NOM_options_str  += '<option value="CA Lisieux Normandie">CA Lisieux Normandie</option>';
+            NOM_options_str  += '<option value="CA Loire Forez Agglomération">CA Loire Forez Agglomération</option>';
+            NOM_options_str  += '<option value="CA Lorient Agglomération">CA Lorient Agglomération</option>';
+            NOM_options_str  += '<option value="CA Luberon Monts de Vaucluse">CA Luberon Monts de Vaucluse</option>';
+            NOM_options_str  += '<option value="CA Lunel Agglo">CA Lunel Agglo</option>';
+            NOM_options_str  += '<option value="CA Marne et Gondoire">CA Marne et Gondoire</option>';
+            NOM_options_str  += '<option value="CA Maubeuge Val de Sambre">CA Maubeuge Val de Sambre</option>';
+            NOM_options_str  += '<option value="CA Mauges Communauté">CA Mauges Communauté</option>';
+            NOM_options_str  += '<option value="CA Melun Val de Seine">CA Melun Val de Seine</option>';
+            NOM_options_str  += '<option value="CA Mont de Marsan Agglomération">CA Mont de Marsan Agglomération</option>';
+            NOM_options_str  += '<option value="CA Mont-Saint-Michel-Normandie">CA Mont-Saint-Michel-Normandie</option>';
+            NOM_options_str  += '<option value="CA Montargoise et Rives du Loing (AME)">CA Montargoise et Rives du Loing (AME)</option>';
+            NOM_options_str  += '<option value="CA Montluçon Communauté">CA Montluçon Communauté</option>';
+            NOM_options_str  += '<option value="CA Montélimar Agglomération">CA Montélimar Agglomération</option>';
+            NOM_options_str  += '<option value="CA Morlaix Communauté">CA Morlaix Communauté</option>';
+            NOM_options_str  += '<option value="CA Moulins Communauté">CA Moulins Communauté</option>';
+            NOM_options_str  += '<option value="CA Mulhouse Alsace Agglomération">CA Mulhouse Alsace Agglomération</option>';
+            NOM_options_str  += '<option value="CA Mâconnais Beaujolais Agglomération">CA Mâconnais Beaujolais Agglomération</option>';
+            NOM_options_str  += '<option value="CA Paris - Vallée de la Marne">CA Paris - Vallée de la Marne</option>';
+            NOM_options_str  += '<option value="CA Pau Béarn Pyrénées">CA Pau Béarn Pyrénées</option>';
+            NOM_options_str  += '<option value="CA Pays de Montbéliard Agglomération">CA Pays de Montbéliard Agglomération</option>';
+            NOM_options_str  += '<option value="CA Plaine Vallée">CA Plaine Vallée</option>';
+            NOM_options_str  += '<option value="CA Pornic Agglo Pays de Retz">CA Pornic Agglo Pays de Retz</option>';
+            NOM_options_str  += '<option value="CA Porte de l&apos;Isère (CAPI)">CA Porte de l&apos;Isère (CAPI)</option>';
+            NOM_options_str  += '<option value="CA Portes de France-Thionville">CA Portes de France-Thionville</option>';
+            NOM_options_str  += '<option value="CA Privas Centre Ardèche">CA Privas Centre Ardèche</option>';
+            NOM_options_str  += '<option value="CA Provence-Alpes-Agglomération">CA Provence-Alpes-Agglomération</option>';
+            NOM_options_str  += '<option value="CA Quimper Bretagne Occidentale">CA Quimper Bretagne Occidentale</option>';
+            NOM_options_str  += '<option value="CA Quimperlé Communauté">CA Quimperlé Communauté</option>';
+            NOM_options_str  += '<option value="CA Rambouillet Territoires">CA Rambouillet Territoires</option>';
+            NOM_options_str  += '<option value="CA Redon Agglomération">CA Redon Agglomération</option>';
+            NOM_options_str  += '<option value="CA Riom Limagne et Volcans">CA Riom Limagne et Volcans</option>';
+            NOM_options_str  += '<option value="CA Roannais Agglomération">CA Roannais Agglomération</option>';
+            NOM_options_str  += '<option value="CA Rochefort Océan">CA Rochefort Océan</option>';
+            NOM_options_str  += '<option value="CA Rodez Agglomération">CA Rodez Agglomération</option>';
+            NOM_options_str  += '<option value="CA Roissy Pays de France">CA Roissy Pays de France</option>';
+            NOM_options_str  += '<option value="CA Royan Atlantique">CA Royan Atlantique</option>';
+            NOM_options_str  += '<option value="CA Saint Germain Boucles de Seine">CA Saint Germain Boucles de Seine</option>';
+            NOM_options_str  += '<option value="CA Saint-Avold Synergie">CA Saint-Avold Synergie</option>';
+            NOM_options_str  += '<option value="CA Saint-Brieuc Armor Agglomération">CA Saint-Brieuc Armor Agglomération</option>';
+            NOM_options_str  += '<option value="CA Saint-Louis Agglomération">CA Saint-Louis Agglomération</option>';
+            NOM_options_str  += '<option value="CA Saint-Lô Agglo">CA Saint-Lô Agglo</option>';
+            NOM_options_str  += '<option value="CA Sarreguemines Confluences">CA Sarreguemines Confluences</option>';
+            NOM_options_str  += '<option value="CA Saumur Val de Loire">CA Saumur Val de Loire</option>';
+            NOM_options_str  += '<option value="CA Seine Normandie Agglomération">CA Seine Normandie Agglomération</option>';
+            NOM_options_str  += '<option value="CA Seine-Eure">CA Seine-Eure</option>';
+            NOM_options_str  += '<option value="CA Sud Sainte Baume">CA Sud Sainte Baume</option>';
+            NOM_options_str  += '<option value="CA Sète Agglopôle Méditerranée">CA Sète Agglopôle Méditerranée</option>';
+            NOM_options_str  += '<option value="CA Tarbes-Lourdes-Pyrénées">CA Tarbes-Lourdes-Pyrénées</option>';
+            NOM_options_str  += '<option value="CA Terre de Provence">CA Terre de Provence</option>';
+            NOM_options_str  += '<option value="CA Terres de Montaigu">CA Terres de Montaigu</option>';
+            NOM_options_str  += '<option value="CA Territoire de la Côte Ouest (TCO)">CA Territoire de la Côte Ouest (TCO)</option>';
+            NOM_options_str  += '<option value="CA Territoires Vendômois">CA Territoires Vendômois</option>';
+            NOM_options_str  += '<option value="CA Thonon Agglomération">CA Thonon Agglomération</option>';
+            NOM_options_str  += '<option value="CA Troyes Champagne Métropole">CA Troyes Champagne Métropole</option>';
+            NOM_options_str  += '<option value="CA Tulle Agglo">CA Tulle Agglo</option>';
+            NOM_options_str  += '<option value="CA Val Parisis">CA Val Parisis</option>';
+            NOM_options_str  += '<option value="CA Val d&apos;Europe Agglomération">CA Val d&apos;Europe Agglomération</option>';
+            NOM_options_str  += '<option value="CA Val d&apos;Yerres Val de Seine">CA Val d&apos;Yerres Val de Seine</option>';
+            NOM_options_str  += '<option value="CA Val de Garonne Agglomération">CA Val de Garonne Agglomération</option>';
+            NOM_options_str  += '<option value="CA Valence Romans Agglo">CA Valence Romans Agglo</option>';
+            NOM_options_str  += '<option value="CA Valenciennes Métropole">CA Valenciennes Métropole</option>';
+            NOM_options_str  += '<option value="CA Ventoux-Comtat-Venaissin (COVE)">CA Ventoux-Comtat-Venaissin (COVE)</option>';
+            NOM_options_str  += '<option value="CA Versailles Grand Parc (CAVGP)">CA Versailles Grand Parc (CAVGP)</option>';
+            NOM_options_str  += '<option value="CA Vichy Communauté">CA Vichy Communauté</option>';
+            NOM_options_str  += '<option value="CA Vienne Condrieu">CA Vienne Condrieu</option>';
+            NOM_options_str  += '<option value="CA Villefranche Beaujolais Saône">CA Villefranche Beaujolais Saône</option>';
+            NOM_options_str  += '<option value="CA Vitré Communauté">CA Vitré Communauté</option>';
+            NOM_options_str  += '<option value="CA d&apos;Arles-Crau-Camargue-Montagnette">CA d&apos;Arles-Crau-Camargue-Montagnette</option>';
+            NOM_options_str  += '<option value="CA d&apos;Hénin-Carvin">CA d&apos;Hénin-Carvin</option>';
+            NOM_options_str  += '<option value="CA d&apos;Épinal">CA d&apos;Épinal</option>';
+            NOM_options_str  += '<option value="CA de Bar-le-Duc - Sud Meuse">CA de Bar-le-Duc - Sud Meuse</option>';
+            NOM_options_str  += '<option value="CA de Bastia">CA de Bastia</option>';
+            NOM_options_str  += '<option value="CA de Blois "Agglopolys"">CA de Blois "Agglopolys"</option>';
+            NOM_options_str  += '<option value="CA de Béthune-Bruay, Artois-Lys Romane">CA de Béthune-Bruay, Artois-Lys Romane</option>';
+            NOM_options_str  += '<option value="CA de Béziers-Méditerranée">CA de Béziers-Méditerranée</option>';
+            NOM_options_str  += '<option value="CA de Cambrai">CA de Cambrai</option>';
+            NOM_options_str  += '<option value="CA de Castres Mazamet">CA de Castres Mazamet</option>';
+            NOM_options_str  += '<option value="CA de Cergy-Pontoise">CA de Cergy-Pontoise</option>';
+            NOM_options_str  += '<option value="CA de Chaumont">CA de Chaumont</option>';
+            NOM_options_str  += '<option value="CA de Châlons-en-Champagne">CA de Châlons-en-Champagne</option>';
+            NOM_options_str  += '<option value="CA de Dembeni / Mamoudzou">CA de Dembeni / Mamoudzou</option>';
+            NOM_options_str  += '<option value="CA de Forbach Porte de France">CA de Forbach Porte de France</option>';
+            NOM_options_str  += '<option value="CA de Haguenau">CA de Haguenau</option>';
+            NOM_options_str  += '<option value="CA de La Rochelle">CA de La Rochelle</option>';
+            NOM_options_str  += '<option value="CA de Lens - Liévin">CA de Lens - Liévin</option>';
+            NOM_options_str  += '<option value="CA de Nevers">CA de Nevers</option>';
+            NOM_options_str  += '<option value="CA de Nîmes Métropole">CA de Nîmes Métropole</option>';
+            NOM_options_str  += '<option value="CA de Saint-Dié-des-Vosges">CA de Saint-Dié-des-Vosges</option>';
+            NOM_options_str  += '<option value="CA de Saint-Quentin-en-Yvelines">CA de Saint-Quentin-en-Yvelines</option>';
+            NOM_options_str  += '<option value="CA de Saintes">CA de Saintes</option>';
+            NOM_options_str  += '<option value="CA de Sophia Antipolis">CA de Sophia Antipolis</option>';
+            NOM_options_str  += '<option value="CA de Vesoul">CA de Vesoul</option>';
+            NOM_options_str  += '<option value="CA de l&apos;Albigeois (C2A)">CA de l&apos;Albigeois (C2A)</option>';
+            NOM_options_str  += '<option value="CA de l&apos;Auxerrois">CA de l&apos;Auxerrois</option>';
+            NOM_options_str  += '<option value="CA de l&apos;Espace Sud de la Martinique">CA de l&apos;Espace Sud de la Martinique</option>';
+            NOM_options_str  += '<option value="CA de l&apos;Ouest Rhodanien">CA de l&apos;Ouest Rhodanien</option>';
+            NOM_options_str  += '<option value="CA de la Baie de Somme">CA de la Baie de Somme</option>';
+            NOM_options_str  += '<option value="CA de la Porte du Hainaut">CA de la Porte du Hainaut</option>';
+            NOM_options_str  += '<option value="CA de la Presqu&apos;île de Guérande Atlantique (Cap Atlantique)">CA de la Presqu&apos;île de Guérande Atlantique (Cap Atlantique)</option>';
+            NOM_options_str  += '<option value="CA de la Provence Verte">CA de la Provence Verte</option>';
+            NOM_options_str  += '<option value="CA de la Riviera Française">CA de la Riviera Française</option>';
+            NOM_options_str  += '<option value="CA de la Région Dieppoise">CA de la Région Dieppoise</option>';
+            NOM_options_str  += '<option value="CA de la Région Nazairienne et de l&apos;Estuaire (CARENE)">CA de la Région Nazairienne et de l&apos;Estuaire (CARENE)</option>';
+            NOM_options_str  += '<option value="CA de la Région de Château-Thierry">CA de la Région de Château-Thierry</option>';
+            NOM_options_str  += '<option value="CA de la Région de Compiègne et de la Basse Automne">CA de la Région de Compiègne et de la Basse Automne</option>';
+            NOM_options_str  += '<option value="CA des Deux Baies en Montreuillois">CA des Deux Baies en Montreuillois</option>';
+            NOM_options_str  += '<option value="CA des Sorgues du Comtat">CA des Sorgues du Comtat</option>';
+            NOM_options_str  += '<option value="CA du Bassin d&apos;Arcachon Nord">CA du Bassin d&apos;Arcachon Nord</option>';
+            NOM_options_str  += '<option value="CA du Bassin d&apos;Aurillac">CA du Bassin d&apos;Aurillac</option>';
+            NOM_options_str  += '<option value="CA du Bassin de Bourg-en-Bresse">CA du Bassin de Bourg-en-Bresse</option>';
+            NOM_options_str  += '<option value="CA du Bassin de Brive">CA du Bassin de Brive</option>';
+            NOM_options_str  += '<option value="CA du Beauvaisis">CA du Beauvaisis</option>';
+            NOM_options_str  += '<option value="CA du Bocage Bressuirais">CA du Bocage Bressuirais</option>';
+            NOM_options_str  += '<option value="CA du Boulonnais">CA du Boulonnais</option>';
+            NOM_options_str  += '<option value="CA du Caudrésis et du Catésis">CA du Caudrésis et du Catésis</option>';
+            NOM_options_str  += '<option value="CA du Centre Littoral">CA du Centre Littoral</option>';
+            NOM_options_str  += '<option value="CA du Cotentin">CA du Cotentin</option>';
+            NOM_options_str  += '<option value="CA du Gard Rhodanien">CA du Gard Rhodanien</option>';
+            NOM_options_str  += '<option value="CA du Grand Angoulême">CA du Grand Angoulême</option>';
+            NOM_options_str  += '<option value="CA du Grand Annecy">CA du Grand Annecy</option>';
+            NOM_options_str  += '<option value="CA du Grand Avignon (COGA)">CA du Grand Avignon (COGA)</option>';
+            NOM_options_str  += '<option value="CA du Grand Cahors">CA du Grand Cahors</option>';
+            NOM_options_str  += '<option value="CA du Grand Chambéry">CA du Grand Chambéry</option>';
+            NOM_options_str  += '<option value="CA du Grand Cognac">CA du Grand Cognac</option>';
+            NOM_options_str  += '<option value="CA du Grand Dax">CA du Grand Dax</option>';
+            NOM_options_str  += '<option value="CA du Grand Dole">CA du Grand Dole</option>';
+            NOM_options_str  += '<option value="CA du Grand Guéret">CA du Grand Guéret</option>';
+            NOM_options_str  += '<option value="CA du Grand Nord de Mayotte">CA du Grand Nord de Mayotte</option>';
+            NOM_options_str  += '<option value="CA du Grand Saint-Dizier Der et Vallée">CA du Grand Saint-Dizier Der et Vallée</option>';
+            NOM_options_str  += '<option value="CA du Grand Sénonais">CA du Grand Sénonais</option>';
+            NOM_options_str  += '<option value="CA du Grand Verdun">CA du Grand Verdun</option>';
+            NOM_options_str  += '<option value="CA du Grand Villeneuvois">CA du Grand Villeneuvois</option>';
+            NOM_options_str  += '<option value="CA du Libournais">CA du Libournais</option>';
+            NOM_options_str  += '<option value="CA du Niortais">CA du Niortais</option>';
+            NOM_options_str  += '<option value="CA du Nord Basse-Terre">CA du Nord Basse-Terre</option>';
+            NOM_options_str  += '<option value="CA du Nord Grande Terre">CA du Nord Grande Terre</option>';
+            NOM_options_str  += '<option value="CA du Pays Ajaccien">CA du Pays Ajaccien</option>';
+            NOM_options_str  += '<option value="CA du Pays Basque">CA du Pays Basque</option>';
+            NOM_options_str  += '<option value="CA du Pays Nord Martinique">CA du Pays Nord Martinique</option>';
+            NOM_options_str  += '<option value="CA du Pays Voironnais">CA du Pays Voironnais</option>';
+            NOM_options_str  += '<option value="CA du Pays de Fontainebleau">CA du Pays de Fontainebleau</option>';
+            NOM_options_str  += '<option value="CA du Pays de Gex">CA du Pays de Gex</option>';
+            NOM_options_str  += '<option value="CA du Pays de Grasse">CA du Pays de Grasse</option>';
+            NOM_options_str  += '<option value="CA du Pays de Landerneau-Daoulas">CA du Pays de Landerneau-Daoulas</option>';
+            NOM_options_str  += '<option value="CA du Pays de Laon">CA du Pays de Laon</option>';
+            NOM_options_str  += '<option value="CA du Pays de Meaux">CA du Pays de Meaux</option>';
+            NOM_options_str  += '<option value="CA du Pays de Saint Malo Agglomération">CA du Pays de Saint Malo Agglomération</option>';
+            NOM_options_str  += '<option value="CA du Pays de Saint-Gilles-Croix-de-Vie">CA du Pays de Saint-Gilles-Croix-de-Vie</option>';
+            NOM_options_str  += '<option value="CA du Pays de Saint-Omer">CA du Pays de Saint-Omer</option>';
+            NOM_options_str  += '<option value="CA du Pays de l&apos;Or">CA du Pays de l&apos;Or</option>';
+            NOM_options_str  += '<option value="CA du Puy-en-Velay">CA du Puy-en-Velay</option>';
+            NOM_options_str  += '<option value="CA du Saint-Quentinois">CA du Saint-Quentinois</option>';
+            NOM_options_str  += '<option value="CA du Sicoval">CA du Sicoval</option>';
+            NOM_options_str  += '<option value="CA du Sud">CA du Sud</option>';
+            NOM_options_str  += '<option value="CA du Val de Fensch">CA du Val de Fensch</option>';
+            NOM_options_str  += '<option value="CA Épernay, Coteaux et Plaine de Champagne">CA Épernay, Coteaux et Plaine de Champagne</option>';
+            NOM_options_str  += '<option value="CA Étampois Sud Essonne">CA Étampois Sud Essonne</option>';
+            NOM_options_str  += '<option value="CC Adour Madiran">CC Adour Madiran</option>';
+            NOM_options_str  += '<option value="CC Agly Fenouillèdes">CC Agly Fenouillèdes</option>';
+            NOM_options_str  += '<option value="CC Airvaudais-Val du Thouet">CC Airvaudais-Val du Thouet</option>';
+            NOM_options_str  += '<option value="CC Albret Communauté">CC Albret Communauté</option>';
+            NOM_options_str  += '<option value="CC Alpes d&apos;Azur">CC Alpes d&apos;Azur</option>';
+            NOM_options_str  += '<option value="CC Alpes-Provence-Verdon - Sources de Lumière">CC Alpes-Provence-Verdon - Sources de Lumière</option>';
+            NOM_options_str  += '<option value="CC Altitude 800">CC Altitude 800</option>';
+            NOM_options_str  += '<option value="CC Ambert Livradois Forez">CC Ambert Livradois Forez</option>';
+            NOM_options_str  += '<option value="CC Amognes Cœur du Nivernais">CC Amognes Cœur du Nivernais</option>';
+            NOM_options_str  += '<option value="CC Andaine - Passais">CC Andaine - Passais</option>';
+            NOM_options_str  += '<option value="CC Anjou Bleu Communauté">CC Anjou Bleu Communauté</option>';
+            NOM_options_str  += '<option value="CC Anjou Loir et Sarthe">CC Anjou Loir et Sarthe</option>';
+            NOM_options_str  += '<option value="CC Arbois, Poligny, Salins, Cœur du Jura">CC Arbois, Poligny, Salins, Cœur du Jura</option>';
+            NOM_options_str  += '<option value="CC Arc Sud Bretagne">CC Arc Sud Bretagne</option>';
+            NOM_options_str  += '<option value="CC Ardenne, Rives de Meuse">CC Ardenne, Rives de Meuse</option>';
+            NOM_options_str  += '<option value="CC Ardennes Thiérache">CC Ardennes Thiérache</option>';
+            NOM_options_str  += '<option value="CC Ardèche Rhône Coiron">CC Ardèche Rhône Coiron</option>';
+            NOM_options_str  += '<option value="CC Ardèche des Sources et Volcans">CC Ardèche des Sources et Volcans</option>';
+            NOM_options_str  += '<option value="CC Argonne-Meuse">CC Argonne-Meuse</option>';
+            NOM_options_str  += '<option value="CC Arize Lèze">CC Arize Lèze</option>';
+            NOM_options_str  += '<option value="CC Armagnac Adour">CC Armagnac Adour</option>';
+            NOM_options_str  += '<option value="CC Arnon Boischaut Cher">CC Arnon Boischaut Cher</option>';
+            NOM_options_str  += '<option value="CC Artagnan de Fezensac">CC Artagnan de Fezensac</option>';
+            NOM_options_str  += '<option value="CC Arve et Salève">CC Arve et Salève</option>';
+            NOM_options_str  += '<option value="CC Astarac Arros en Gascogne">CC Astarac Arros en Gascogne</option>';
+            NOM_options_str  += '<option value="CC Aubrac Lot Causses Tarn">CC Aubrac Lot Causses Tarn</option>';
+            NOM_options_str  += '<option value="CC Aubrac, Carladez et Viadène">CC Aubrac, Carladez et Viadène</option>';
+            NOM_options_str  += '<option value="CC Aunis Atlantique">CC Aunis Atlantique</option>';
+            NOM_options_str  += '<option value="CC Aunis Sud">CC Aunis Sud</option>';
+            NOM_options_str  += '<option value="CC Auray Quiberon Terre Atlantique">CC Auray Quiberon Terre Atlantique</option>';
+            NOM_options_str  += '<option value="CC Aure Louron">CC Aure Louron</option>';
+            NOM_options_str  += '<option value="CC Autour de Chenonceaux Bléré-Val de Cher">CC Autour de Chenonceaux Bléré-Val de Cher</option>';
+            NOM_options_str  += '<option value="CC Aux Sources du Canal du Midi">CC Aux Sources du Canal du Midi</option>';
+            NOM_options_str  += '<option value="CC Auxonne Pontailler Val de Saône">CC Auxonne Pontailler Val de Saône</option>';
+            NOM_options_str  += '<option value="CC Auzon Communauté">CC Auzon Communauté</option>';
+            NOM_options_str  += '<option value="CC Avallon, Vézelay, Morvan">CC Avallon, Vézelay, Morvan</option>';
+            NOM_options_str  += '<option value="CC Aveyron Bas Ségala Viaur">CC Aveyron Bas Ségala Viaur</option>';
+            NOM_options_str  += '<option value="CC Avre Luce Noye">CC Avre Luce Noye</option>';
+            NOM_options_str  += '<option value="CC Aygues-Ouvèze en Provence (CCAOP)">CC Aygues-Ouvèze en Provence (CCAOP)</option>';
+            NOM_options_str  += '<option value="CC Bassée-Montois">CC Bassée-Montois</option>';
+            NOM_options_str  += '<option value="CC Bastides de Lomagne">CC Bastides de Lomagne</option>';
+            NOM_options_str  += '<option value="CC Bastides et Vallons du Gers">CC Bastides et Vallons du Gers</option>';
+            NOM_options_str  += '<option value="CC Baud Communauté">CC Baud Communauté</option>';
+            NOM_options_str  += '<option value="CC Baugeois Vallée">CC Baugeois Vallée</option>';
+            NOM_options_str  += '<option value="CC Bazois Loire Morvan">CC Bazois Loire Morvan</option>';
+            NOM_options_str  += '<option value="CC Beaucaire Terre d&apos;Argence">CC Beaucaire Terre d&apos;Argence</option>';
+            NOM_options_str  += '<option value="CC Beauce Val de Loire">CC Beauce Val de Loire</option>';
+            NOM_options_str  += '<option value="CC Beaujolais Pierres Dorées">CC Beaujolais Pierres Dorées</option>';
+            NOM_options_str  += '<option value="CC Berg et Coiron">CC Berg et Coiron</option>';
+            NOM_options_str  += '<option value="CC Berry Grand Sud">CC Berry Grand Sud</option>';
+            NOM_options_str  += '<option value="CC Berry Loire Puisaye">CC Berry Loire Puisaye</option>';
+            NOM_options_str  += '<option value="CC Berry-Loire-Vauvise">CC Berry-Loire-Vauvise</option>';
+            NOM_options_str  += '<option value="CC Billom Communauté">CC Billom Communauté</option>';
+            NOM_options_str  += '<option value="CC Bièvre Isère">CC Bièvre Isère</option>';
+            NOM_options_str  += '<option value="CC Blavet Bellevue Océan Communauté">CC Blavet Bellevue Océan Communauté</option>';
+            NOM_options_str  += '<option value="CC Bouzonvillois-Trois Frontières">CC Bouzonvillois-Trois Frontières</option>';
+            NOM_options_str  += '<option value="CC Brenne - Val de Creuse">CC Brenne - Val de Creuse</option>';
+            NOM_options_str  += '<option value="CC Bresse Haute Seille">CC Bresse Haute Seille</option>';
+            NOM_options_str  += '<option value="CC Bresse Louhannaise Intercom&apos;">CC Bresse Louhannaise Intercom&apos;</option>';
+            NOM_options_str  += '<option value="CC Bresse Nord Intercom&apos;">CC Bresse Nord Intercom&apos;</option>';
+            NOM_options_str  += '<option value="CC Bresse Revermont 71">CC Bresse Revermont 71</option>';
+            NOM_options_str  += '<option value="CC Bresse et Saône">CC Bresse et Saône</option>';
+            NOM_options_str  += '<option value="CC Bretagne Romantique">CC Bretagne Romantique</option>';
+            NOM_options_str  += '<option value="CC Bretagne porte de Loire Communauté">CC Bretagne porte de Loire Communauté</option>';
+            NOM_options_str  += '<option value="CC Briance Sud Haute Vienne">CC Briance Sud Haute Vienne</option>';
+            NOM_options_str  += '<option value="CC Briance-Combade">CC Briance-Combade</option>';
+            NOM_options_str  += '<option value="CC Brie Nangissienne">CC Brie Nangissienne</option>';
+            NOM_options_str  += '<option value="CC Brie des Rivières et Châteaux">CC Brie des Rivières et Châteaux</option>';
+            NOM_options_str  += '<option value="CC Brionnais Sud Bourgogne">CC Brionnais Sud Bourgogne</option>';
+            NOM_options_str  += '<option value="CC Brioude Sud Auvergne">CC Brioude Sud Auvergne</option>';
+            NOM_options_str  += '<option value="CC Brocéliande Communauté">CC Brocéliande Communauté</option>';
+            NOM_options_str  += '<option value="CC Bruyères-Vallons des Vosges">CC Bruyères-Vallons des Vosges</option>';
+            NOM_options_str  += '<option value="CC Bugey Sud">CC Bugey Sud</option>';
+            NOM_options_str  += '<option value="CC Buëch-Dévoluy">CC Buëch-Dévoluy</option>';
+            NOM_options_str  += '<option value="CC Cagire Garonne Salat">CC Cagire Garonne Salat</option>';
+            NOM_options_str  += '<option value="CC Campagne-de-Caux">CC Campagne-de-Caux</option>';
+            NOM_options_str  += '<option value="CC Canaux et Forêts en Gâtinais">CC Canaux et Forêts en Gâtinais</option>';
+            NOM_options_str  += '<option value="CC Cap Sizun - Pointe du Raz">CC Cap Sizun - Pointe du Raz</option>';
+            NOM_options_str  += '<option value="CC Carmausin-Ségala">CC Carmausin-Ségala</option>';
+            NOM_options_str  += '<option value="CC Carnelle Pays-de-France">CC Carnelle Pays-de-France</option>';
+            NOM_options_str  += '<option value="CC Castelnaudary Lauragais Audois">CC Castelnaudary Lauragais Audois</option>';
+            NOM_options_str  += '<option value="CC Castillon/Pujols">CC Castillon/Pujols</option>';
+            NOM_options_str  += '<option value="CC Causses Aigoual Cévennes">CC Causses Aigoual Cévennes</option>';
+            NOM_options_str  += '<option value="CC Causses et Vallée de la Dordogne">CC Causses et Vallée de la Dordogne</option>';
+            NOM_options_str  += '<option value="CC Caux - Austreberthe">CC Caux - Austreberthe</option>';
+            NOM_options_str  += '<option value="CC Cazals-Salviac">CC Cazals-Salviac</option>';
+            NOM_options_str  += '<option value="CC Celavu-Prunelli">CC Celavu-Prunelli</option>';
+            NOM_options_str  += '<option value="CC Centre Morbihan Communauté">CC Centre Morbihan Communauté</option>';
+            NOM_options_str  += '<option value="CC Centre Tarn">CC Centre Tarn</option>';
+            NOM_options_str  += '<option value="CC Chablis Villages et Terroirs">CC Chablis Villages et Terroirs</option>';
+            NOM_options_str  += '<option value="CC Chabris - Pays de Bazelle">CC Chabris - Pays de Bazelle</option>';
+            NOM_options_str  += '<option value="CC Challans-Gois Communauté">CC Challans-Gois Communauté</option>';
+            NOM_options_str  += '<option value="CC Chalosse Tursan">CC Chalosse Tursan</option>';
+            NOM_options_str  += '<option value="CC Champagne Boischauts">CC Champagne Boischauts</option>';
+            NOM_options_str  += '<option value="CC Champagnole Nozeroy Jura">CC Champagnole Nozeroy Jura</option>';
+            NOM_options_str  += '<option value="CC Champsaur-Valgaudemar">CC Champsaur-Valgaudemar</option>';
+            NOM_options_str  += '<option value="CC Charlieu-Belmont">CC Charlieu-Belmont</option>';
+            NOM_options_str  += '<option value="CC Chavanon Combrailles et Volcans">CC Chavanon Combrailles et Volcans</option>';
+            NOM_options_str  += '<option value="CC Chinon, Vienne et Loire">CC Chinon, Vienne et Loire</option>';
+            NOM_options_str  += '<option value="CC Châteaubriant-Derval">CC Châteaubriant-Derval</option>';
+            NOM_options_str  += '<option value="CC Cingal-Suisse Normande">CC Cingal-Suisse Normande</option>';
+            NOM_options_str  += '<option value="CC Cluses-Arve et Montagnes">CC Cluses-Arve et Montagnes</option>';
+            NOM_options_str  += '<option value="CC Coeur du Pays Haut">CC Coeur du Pays Haut</option>';
+            NOM_options_str  += '<option value="CC Collines Isère Nord Communauté">CC Collines Isère Nord Communauté</option>';
+            NOM_options_str  += '<option value="CC Combrailles Sioule et Morge">CC Combrailles Sioule et Morge</option>';
+            NOM_options_str  += '<option value="CC Commentry Montmarault Néris Communauté">CC Commentry Montmarault Néris Communauté</option>';
+            NOM_options_str  += '<option value="CC Communauté Bray-Eawy">CC Communauté Bray-Eawy</option>';
+            NOM_options_str  += '<option value="CC Communauté Lesneven Côte des Légendes">CC Communauté Lesneven Côte des Légendes</option>';
+            NOM_options_str  += '<option value="CC Comtal Lot et Truyère">CC Comtal Lot et Truyère</option>';
+            NOM_options_str  += '<option value="CC Conflent-Canigó">CC Conflent-Canigó</option>';
+            NOM_options_str  += '<option value="CC Conques-Marcillac">CC Conques-Marcillac</option>';
+            NOM_options_str  += '<option value="CC Convergence Garonne">CC Convergence Garonne</option>';
+            NOM_options_str  += '<option value="CC Corbières Salanque Méditerranée">CC Corbières Salanque Méditerranée</option>';
+            NOM_options_str  += '<option value="CC Coteaux et Vallées des Luys">CC Coteaux et Vallées des Luys</option>';
+            NOM_options_str  += '<option value="CC Couesnon Marches de Bretagne">CC Couesnon Marches de Bretagne</option>';
+            NOM_options_str  += '<option value="CC Couserans-Pyrénées">CC Couserans-Pyrénées</option>';
+            NOM_options_str  += '<option value="CC Coutances Mer et Bocage">CC Coutances Mer et Bocage</option>';
+            NOM_options_str  += '<option value="CC Creuse Confluence">CC Creuse Confluence</option>';
+            NOM_options_str  += '<option value="CC Creuse Grand Sud">CC Creuse Grand Sud</option>';
+            NOM_options_str  += '<option value="CC Creuse Sud Ouest">CC Creuse Sud Ouest</option>';
+            NOM_options_str  += '<option value="CC Cère et Goul en Carladès">CC Cère et Goul en Carladès</option>';
+            NOM_options_str  += '<option value="CC Côte Landes Nature">CC Côte Landes Nature</option>';
+            NOM_options_str  += '<option value="CC Côte Ouest Centre Manche">CC Côte Ouest Centre Manche</option>';
+            NOM_options_str  += '<option value="CC Côte d&apos;Émeraude">CC Côte d&apos;Émeraude</option>';
+            NOM_options_str  += '<option value="CC Côtes de Champagne et Val de Saulx">CC Côtes de Champagne et Val de Saulx</option>';
+            NOM_options_str  += '<option value="CC Côtes de Meuse Woëvre">CC Côtes de Meuse Woëvre</option>';
+            NOM_options_str  += '<option value="CC Cœur Côte Fleurie">CC Cœur Côte Fleurie</option>';
+            NOM_options_str  += '<option value="CC Cœur Haute Lande">CC Cœur Haute Lande</option>';
+            NOM_options_str  += '<option value="CC Cœur d&apos;Astarac en Gascogne">CC Cœur d&apos;Astarac en Gascogne</option>';
+            NOM_options_str  += '<option value="CC Cœur d&apos;Ostrevent">CC Cœur d&apos;Ostrevent</option>';
+            NOM_options_str  += '<option value="CC Cœur d&apos;Yvelines">CC Cœur d&apos;Yvelines</option>';
+            NOM_options_str  += '<option value="CC Cœur de Beauce">CC Cœur de Beauce</option>';
+            NOM_options_str  += '<option value="CC Cœur de Berry">CC Cœur de Berry</option>';
+            NOM_options_str  += '<option value="CC Cœur de Brenne">CC Cœur de Brenne</option>';
+            NOM_options_str  += '<option value="CC Cœur de Charente">CC Cœur de Charente</option>';
+            NOM_options_str  += '<option value="CC Cœur de Chartreuse">CC Cœur de Chartreuse</option>';
+            NOM_options_str  += '<option value="CC Cœur de France">CC Cœur de France</option>';
+            NOM_options_str  += '<option value="CC Cœur de Garonne">CC Cœur de Garonne</option>';
+            NOM_options_str  += '<option value="CC Cœur de Loire">CC Cœur de Loire</option>';
+            NOM_options_str  += '<option value="CC Cœur de Lozère">CC Cœur de Lozère</option>';
+            NOM_options_str  += '<option value="CC Cœur de Maurienne Arvan">CC Cœur de Maurienne Arvan</option>';
+            NOM_options_str  += '<option value="CC Cœur de Nacre">CC Cœur de Nacre</option>';
+            NOM_options_str  += '<option value="CC Cœur de Saintonge">CC Cœur de Saintonge</option>';
+            NOM_options_str  += '<option value="CC Cœur de Savoie">CC Cœur de Savoie</option>';
+            NOM_options_str  += '<option value="CC Cœur de Sologne">CC Cœur de Sologne</option>';
+            NOM_options_str  += '<option value="CC Cœur de Tarentaise">CC Cœur de Tarentaise</option>';
+            NOM_options_str  += '<option value="CC Cœur de l&apos;Avesnois">CC Cœur de l&apos;Avesnois</option>';
+            NOM_options_str  += '<option value="CC Cœur du Perche">CC Cœur du Perche</option>';
+            NOM_options_str  += '<option value="CC Cœur du Var">CC Cœur du Var</option>';
+            NOM_options_str  += '<option value="CC Cœur et Coteaux du Comminges">CC Cœur et Coteaux du Comminges</option>';
+            NOM_options_str  += '<option value="CC Decazeville Communauté">CC Decazeville Communauté</option>';
+            NOM_options_str  += '<option value="CC Dieulefit-Bourdeaux">CC Dieulefit-Bourdeaux</option>';
+            NOM_options_str  += '<option value="CC Dombes Saône Vallée">CC Dombes Saône Vallée</option>';
+            NOM_options_str  += '<option value="CC Domfront Tinchebray Interco">CC Domfront Tinchebray Interco</option>';
+            NOM_options_str  += '<option value="CC Douarnenez Communauté">CC Douarnenez Communauté</option>';
+            NOM_options_str  += '<option value="CC Dronne et Belle">CC Dronne et Belle</option>';
+            NOM_options_str  += '<option value="CC Drôme Sud Provence">CC Drôme Sud Provence</option>';
+            NOM_options_str  += '<option value="CC Dômes Sancy Artense">CC Dômes Sancy Artense</option>';
+            NOM_options_str  += '<option value="CC Enclave des Papes-Pays de Grignan">CC Enclave des Papes-Pays de Grignan</option>';
+            NOM_options_str  += '<option value="CC Entr&apos;Allier Besbre et Loire">CC Entr&apos;Allier Besbre et Loire</option>';
+            NOM_options_str  += '<option value="CC Entre Arroux, Loire et Somme">CC Entre Arroux, Loire et Somme</option>';
+            NOM_options_str  += '<option value="CC Entre Bièvre et Rhône">CC Entre Bièvre et Rhône</option>';
+            NOM_options_str  += '<option value="CC Entre Dore et Allier">CC Entre Dore et Allier</option>';
+            NOM_options_str  += '<option value="CC Entre Juine et Renarde (CCEJR)">CC Entre Juine et Renarde (CCEJR)</option>';
+            NOM_options_str  += '<option value="CC Entre Saône et Grosne">CC Entre Saône et Grosne</option>';
+            NOM_options_str  += '<option value="CC Estuaire et Sillon">CC Estuaire et Sillon</option>';
+            NOM_options_str  += '<option value="CC Falaises du Talou">CC Falaises du Talou</option>';
+            NOM_options_str  += '<option value="CC Faucigny-Glières">CC Faucigny-Glières</option>';
+            NOM_options_str  += '<option value="CC FerCher">CC FerCher</option>';
+            NOM_options_str  += '<option value="CC Fier et Usses">CC Fier et Usses</option>';
+            NOM_options_str  += '<option value="CC Flandre Lys">CC Flandre Lys</option>';
+            NOM_options_str  += '<option value="CC Forêts, Lacs, Terres en Champagne">CC Forêts, Lacs, Terres en Champagne</option>';
+            NOM_options_str  += '<option value="CC Forêts, Seine et Suzon">CC Forêts, Seine et Suzon</option>';
+            NOM_options_str  += '<option value="CC Fumel Vallée du Lot">CC Fumel Vallée du Lot</option>';
+            NOM_options_str  += '<option value="CC Gally Mauldre">CC Gally Mauldre</option>';
+            NOM_options_str  += '<option value="CC Gartempe - Saint-Pardoux">CC Gartempe - Saint-Pardoux</option>';
+            NOM_options_str  += '<option value="CC Giennoises">CC Giennoises</option>';
+            NOM_options_str  += '<option value="CC Gorges Causses Cévennes">CC Gorges Causses Cévennes</option>';
+            NOM_options_str  += '<option value="CC Grand Lieu Communauté">CC Grand Lieu Communauté</option>';
+            NOM_options_str  += '<option value="CC Grand Orb communauté de communes en Languedoc">CC Grand Orb communauté de communes en Languedoc</option>';
+            NOM_options_str  += '<option value="CC Grand Sud Tarn et Garonne">CC Grand Sud Tarn et Garonne</option>';
+            NOM_options_str  += '<option value="CC Grand-Figeac">CC Grand-Figeac</option>';
+            NOM_options_str  += '<option value="CC Gâtinais Val de Loing">CC Gâtinais Val de Loing</option>';
+            NOM_options_str  += '<option value="CC Gérardmer Hautes Vosges">CC Gérardmer Hautes Vosges</option>';
+            NOM_options_str  += '<option value="CC Haut Chemin-Pays de Pange">CC Haut Chemin-Pays de Pange</option>';
+            NOM_options_str  += '<option value="CC Haut Limousin en Marche">CC Haut Limousin en Marche</option>';
+            NOM_options_str  += '<option value="CC Haut Nivernais-Val d&apos;Yonne">CC Haut Nivernais-Val d&apos;Yonne</option>';
+            NOM_options_str  += '<option value="CC Haut Val de Sèvre">CC Haut Val de Sèvre</option>';
+            NOM_options_str  += '<option value="CC Haut-Jura Arcade Communauté">CC Haut-Jura Arcade Communauté</option>';
+            NOM_options_str  += '<option value="CC Haut-Jura Saint-Claude">CC Haut-Jura Saint-Claude</option>';
+            NOM_options_str  += '<option value="CC Haut-Léon Communauté">CC Haut-Léon Communauté</option>';
+            NOM_options_str  += '<option value="CC Haute Maurienne Vanoise">CC Haute Maurienne Vanoise</option>';
+            NOM_options_str  += '<option value="CC Haute Sarthe Alpes Mancelles">CC Haute Sarthe Alpes Mancelles</option>';
+            NOM_options_str  += '<option value="CC Haute-Corrèze Communauté">CC Haute-Corrèze Communauté</option>';
+            NOM_options_str  += '<option value="CC Haute-Provence-Pays de Banon">CC Haute-Provence-Pays de Banon</option>';
+            NOM_options_str  += '<option value="CC Hautes Terres Communauté">CC Hautes Terres Communauté</option>';
+            NOM_options_str  += '<option value="CC Houve-Pays Boulageois">CC Houve-Pays Boulageois</option>';
+            NOM_options_str  += '<option value="CC Inter-Caux-Vexin">CC Inter-Caux-Vexin</option>';
+            NOM_options_str  += '<option value="CC Interco Normandie Sud Eure">CC Interco Normandie Sud Eure</option>';
+            NOM_options_str  += '<option value="CC Intercom Bernay Terres de Normandie">CC Intercom Bernay Terres de Normandie</option>';
+            NOM_options_str  += '<option value="CC Intercom de la Vire au Noireau">CC Intercom de la Vire au Noireau</option>';
+            NOM_options_str  += '<option value="CC Isigny-Omaha Intercom">CC Isigny-Omaha Intercom</option>';
+            NOM_options_str  += '<option value="CC Isle Double Landais">CC Isle Double Landais</option>';
+            NOM_options_str  += '<option value="CC Isle Vern Salembre en Périgord">CC Isle Vern Salembre en Périgord</option>';
+            NOM_options_str  += '<option value="CC Isle et Crempse en Périgord">CC Isle et Crempse en Périgord</option>';
+            NOM_options_str  += '<option value="CC Isle-Loue-Auvézère en Périgord">CC Isle-Loue-Auvézère en Périgord</option>';
+            NOM_options_str  += '<option value="CC Jabron-Lure-Vançon-Durance">CC Jabron-Lure-Vançon-Durance</option>';
+            NOM_options_str  += '<option value="CC Jalle-Eau-Bourde">CC Jalle-Eau-Bourde</option>';
+            NOM_options_str  += '<option value="CC Jura Nord">CC Jura Nord</option>';
+            NOM_options_str  += '<option value="CC LBN Communauté">CC LBN Communauté</option>';
+            NOM_options_str  += '<option value="CC La Domitienne">CC La Domitienne</option>';
+            NOM_options_str  += '<option value="CC La Grandvallière">CC La Grandvallière</option>';
+            NOM_options_str  += '<option value="CC La Rochefoucauld porte du Périgord">CC La Rochefoucauld porte du Périgord</option>';
+            NOM_options_str  += '<option value="CC La Septaine">CC La Septaine</option>';
+            NOM_options_str  += '<option value="CC Lacs et Gorges du Verdon">CC Lacs et Gorges du Verdon</option>';
+            NOM_options_str  += '<option value="CC Larzac et Vallées">CC Larzac et Vallées</option>';
+            NOM_options_str  += '<option value="CC Latitude Nord Gironde">CC Latitude Nord Gironde</option>';
+            NOM_options_str  += '<option value="CC Lavalette Tude Dronne">CC Lavalette Tude Dronne</option>';
+            NOM_options_str  += '<option value="CC Le Dourdannais en Hurepoix (CCDH)">CC Le Dourdannais en Hurepoix (CCDH)</option>';
+            NOM_options_str  += '<option value="CC Le Gesnois Bilurien">CC Le Gesnois Bilurien</option>';
+            NOM_options_str  += '<option value="CC Le Grand Charolais">CC Le Grand Charolais</option>';
+            NOM_options_str  += '<option value="CC Le Grand Ouest Toulousain">CC Le Grand Ouest Toulousain</option>';
+            NOM_options_str  += '<option value="CC Le Grésivaudan">CC Le Grésivaudan</option>';
+            NOM_options_str  += '<option value="CC Le Tonnerrois en Bourgogne">CC Le Tonnerrois en Bourgogne</option>';
+            NOM_options_str  += '<option value="CC Leff Armor Communauté">CC Leff Armor Communauté</option>';
+            NOM_options_str  += '<option value="CC Les Avant-Monts">CC Les Avant-Monts</option>';
+            NOM_options_str  += '<option value="CC Les Balcons du Dauphiné">CC Les Balcons du Dauphiné</option>';
+            NOM_options_str  += '<option value="CC Les Bertranges">CC Les Bertranges</option>';
+            NOM_options_str  += '<option value="CC Les Coteaux Bordelais">CC Les Coteaux Bordelais</option>';
+            NOM_options_str  += '<option value="CC Les Portes Briardes entre Villes et Forêts">CC Les Portes Briardes entre Villes et Forêts</option>';
+            NOM_options_str  += '<option value="CC Les Portes de l&apos;Ile de France">CC Les Portes de l&apos;Ile de France</option>';
+            NOM_options_str  += '<option value="CC Les Rives de la Laurence">CC Les Rives de la Laurence</option>';
+            NOM_options_str  += '<option value="CC Les Trois Provinces">CC Les Trois Provinces</option>';
+            NOM_options_str  += '<option value="CC Les Vals du Dauphiné">CC Les Vals du Dauphiné</option>';
+            NOM_options_str  += '<option value="CC Les Versants d&apos;Aime">CC Les Versants d&apos;Aime</option>';
+            NOM_options_str  += '<option value="CC Levroux Boischaut Champagne">CC Levroux Boischaut Champagne</option>';
+            NOM_options_str  += '<option value="CC Lieuvin Pays d&apos;Auge">CC Lieuvin Pays d&apos;Auge</option>';
+            NOM_options_str  += '<option value="CC Liffré-Cormier Communauté">CC Liffré-Cormier Communauté</option>';
+            NOM_options_str  += '<option value="CC Loches Sud Touraine">CC Loches Sud Touraine</option>';
+            NOM_options_str  += '<option value="CC Lodévois et Larzac">CC Lodévois et Larzac</option>';
+            NOM_options_str  += '<option value="CC Loir-Lucé-Bercé">CC Loir-Lucé-Bercé</option>';
+            NOM_options_str  += '<option value="CC Loire Layon Aubance">CC Loire Layon Aubance</option>';
+            NOM_options_str  += '<option value="CC Loire et Allier">CC Loire et Allier</option>';
+            NOM_options_str  += '<option value="CC Loire et Semène">CC Loire et Semène</option>';
+            NOM_options_str  += '<option value="CC Lot et Tolzac">CC Lot et Tolzac</option>';
+            NOM_options_str  += '<option value="CC Loudéac Communauté - Bretagne Centre">CC Loudéac Communauté - Bretagne Centre</option>';
+            NOM_options_str  += '<option value="CC Loue-Lison">CC Loue-Lison</option>';
+            NOM_options_str  += '<option value="CC Lyon Saint Exupéry en Dauphiné">CC Lyon Saint Exupéry en Dauphiné</option>';
+            NOM_options_str  += '<option value="CC Lyons Andelle">CC Lyons Andelle</option>';
+            NOM_options_str  += '<option value="CC Mad et Moselle">CC Mad et Moselle</option>';
+            NOM_options_str  += '<option value="CC Maine Cœur de Sarthe">CC Maine Cœur de Sarthe</option>';
+            NOM_options_str  += '<option value="CC Maine Saosnois">CC Maine Saosnois</option>';
+            NOM_options_str  += '<option value="CC Marche Occitane - Val d&apos;Anglin">CC Marche Occitane - Val d&apos;Anglin</option>';
+            NOM_options_str  += '<option value="CC Marche et Combraille en Aquitaine">CC Marche et Combraille en Aquitaine</option>';
+            NOM_options_str  += '<option value="CC Marches du Velay-Rochebaron">CC Marches du Velay-Rochebaron</option>';
+            NOM_options_str  += '<option value="CC Maremne Adour Côte Sud">CC Maremne Adour Côte Sud</option>';
+            NOM_options_str  += '<option value="CC Maurienne Galibier">CC Maurienne Galibier</option>';
+            NOM_options_str  += '<option value="CC Mayenne Communauté">CC Mayenne Communauté</option>';
+            NOM_options_str  += '<option value="CC Mellois en Poitou">CC Mellois en Poitou</option>';
+            NOM_options_str  += '<option value="CC Meurthe Mortagne Moselle">CC Meurthe Mortagne Moselle</option>';
+            NOM_options_str  += '<option value="CC Meuse Rognon">CC Meuse Rognon</option>';
+            NOM_options_str  += '<option value="CC Midi Corrézien">CC Midi Corrézien</option>';
+            NOM_options_str  += '<option value="CC Mirebellois et Fontenois">CC Mirebellois et Fontenois</option>';
+            NOM_options_str  += '<option value="CC Mond&apos;Arverne Communauté">CC Mond&apos;Arverne Communauté</option>';
+            NOM_options_str  += '<option value="CC Mont Lozère">CC Mont Lozère</option>';
+            NOM_options_str  += '<option value="CC Montfort Communauté">CC Montfort Communauté</option>';
+            NOM_options_str  += '<option value="CC Monts d&apos;Arrée Communauté">CC Monts d&apos;Arrée Communauté</option>';
+            NOM_options_str  += '<option value="CC Monts, Rance et Rougier">CC Monts, Rance et Rougier</option>';
+            NOM_options_str  += '<option value="CC Moret Seine et Loing">CC Moret Seine et Loing</option>';
+            NOM_options_str  += '<option value="CC Morvan Sommets et Grands Lacs">CC Morvan Sommets et Grands Lacs</option>';
+            NOM_options_str  += '<option value="CC Moselle et Madon">CC Moselle et Madon</option>';
+            NOM_options_str  += '<option value="CC Mâconnais - Tournugeois">CC Mâconnais - Tournugeois</option>';
+            NOM_options_str  += '<option value="CC Méditerranée Porte des Maures">CC Méditerranée Porte des Maures</option>';
+            NOM_options_str  += '<option value="CC Médoc Atlantique">CC Médoc Atlantique</option>';
+            NOM_options_str  += '<option value="CC Médoc Cœur de Presqu&apos;île">CC Médoc Cœur de Presqu&apos;île</option>';
+            NOM_options_str  += '<option value="CC Médoc Estuaire">CC Médoc Estuaire</option>';
+            NOM_options_str  += '<option value="CC Médullienne">CC Médullienne</option>';
+            NOM_options_str  += '<option value="CC Mézenc-Loire-Meygal">CC Mézenc-Loire-Meygal</option>';
+            NOM_options_str  += '<option value="CC Nebbiu - Conca d&apos;Oro">CC Nebbiu - Conca d&apos;Oro</option>';
+            NOM_options_str  += '<option value="CC Neste Barousse">CC Neste Barousse</option>';
+            NOM_options_str  += '<option value="CC Nièvre et Somme">CC Nièvre et Somme</option>';
+            NOM_options_str  += '<option value="CC Norge et Tille">CC Norge et Tille</option>';
+            NOM_options_str  += '<option value="CC Normandie-Cabourg-Pays d&apos;Auge">CC Normandie-Cabourg-Pays d&apos;Auge</option>';
+            NOM_options_str  += '<option value="CC Océan Marais de Monts">CC Océan Marais de Monts</option>';
+            NOM_options_str  += '<option value="CC Orne Lorraine Confluences">CC Orne Lorraine Confluences</option>';
+            NOM_options_str  += '<option value="CC Orée de Bercé - Belinois">CC Orée de Bercé - Belinois</option>';
+            NOM_options_str  += '<option value="CC Osartis Marquion">CC Osartis Marquion</option>';
+            NOM_options_str  += '<option value="CC Ouche et Montagne">CC Ouche et Montagne</option>';
+            NOM_options_str  += '<option value="CC Ouest Aveyron Communauté">CC Ouest Aveyron Communauté</option>';
+            NOM_options_str  += '<option value="CC Ouest Limousin">CC Ouest Limousin</option>';
+            NOM_options_str  += '<option value="CC Pasquale Paoli">CC Pasquale Paoli</option>';
+            NOM_options_str  += '<option value="CC Pays Forcalquier et Montagne de Lure">CC Pays Forcalquier et Montagne de Lure</option>';
+            NOM_options_str  += '<option value="CC Pays Fort Sancerrois Val de Loire">CC Pays Fort Sancerrois Val de Loire</option>';
+            NOM_options_str  += '<option value="CC Pays Rhin - Brisach">CC Pays Rhin - Brisach</option>';
+            NOM_options_str  += '<option value="CC Pays Ségali Communauté">CC Pays Ségali Communauté</option>';
+            NOM_options_str  += '<option value="CC Pays d&apos;Apt-Luberon">CC Pays d&apos;Apt-Luberon</option>';
+            NOM_options_str  += '<option value="CC Pays d&apos;Opale">CC Pays d&apos;Opale</option>';
+            NOM_options_str  += '<option value="CC Pays d&apos;Orange en Provence">CC Pays d&apos;Orange en Provence</option>';
+            NOM_options_str  += '<option value="CC Pays d&apos;Orthe et Arrigans">CC Pays d&apos;Orthe et Arrigans</option>';
+            NOM_options_str  += '<option value="CC Pays d&apos;Uzès">CC Pays d&apos;Uzès</option>';
+            NOM_options_str  += '<option value="CC Pays d&apos;Évian Vallée d&apos;Abondance">CC Pays d&apos;Évian Vallée d&apos;Abondance</option>';
+            NOM_options_str  += '<option value="CC Pays de Blain Communauté">CC Pays de Blain Communauté</option>';
+            NOM_options_str  += '<option value="CC Pays de Chantonnay">CC Pays de Chantonnay</option>';
+            NOM_options_str  += '<option value="CC Pays de Châteaugiron Communauté">CC Pays de Châteaugiron Communauté</option>';
+            NOM_options_str  += '<option value="CC Pays de Fontenay-Vendée">CC Pays de Fontenay-Vendée</option>';
+            NOM_options_str  += '<option value="CC Pays de Montereau">CC Pays de Montereau</option>';
+            NOM_options_str  += '<option value="CC Pays de Nay">CC Pays de Nay</option>';
+            NOM_options_str  += '<option value="CC Pays de Nemours">CC Pays de Nemours</option>';
+            NOM_options_str  += '<option value="CC Pays de Nexon Monts de Chalus">CC Pays de Nexon Monts de Chalus</option>';
+            NOM_options_str  += '<option value="CC Pays de Nérondes">CC Pays de Nérondes</option>';
+            NOM_options_str  += '<option value="CC Pays des Vans en Cévennes">CC Pays des Vans en Cévennes</option>';
+            NOM_options_str  += '<option value="CC Pays du Mont-Blanc">CC Pays du Mont-Blanc</option>';
+            NOM_options_str  += '<option value="CC Perthois-Bocage et Der">CC Perthois-Bocage et Der</option>';
+            NOM_options_str  += '<option value="CC Picardie des Châteaux">CC Picardie des Châteaux</option>';
+            NOM_options_str  += '<option value="CC Piège Lauragais Malepère">CC Piège Lauragais Malepère</option>';
+            NOM_options_str  += '<option value="CC Plaine Limagne">CC Plaine Limagne</option>';
+            NOM_options_str  += '<option value="CC Plaines et Monts de France">CC Plaines et Monts de France</option>';
+            NOM_options_str  += '<option value="CC Plateau de Caux">CC Plateau de Caux</option>';
+            NOM_options_str  += '<option value="CC Pleyben-Châteaulin-Porzay">CC Pleyben-Châteaulin-Porzay</option>';
+            NOM_options_str  += '<option value="CC Ploërmel Communauté">CC Ploërmel Communauté</option>';
+            NOM_options_str  += '<option value="CC Poher communauté">CC Poher communauté</option>';
+            NOM_options_str  += '<option value="CC Ponthieu-Marquenterre">CC Ponthieu-Marquenterre</option>';
+            NOM_options_str  += '<option value="CC Pontivy Communauté">CC Pontivy Communauté</option>';
+            NOM_options_str  += '<option value="CC Porte Océane du Limousin">CC Porte Océane du Limousin</option>';
+            NOM_options_str  += '<option value="CC Porte de DrômArdèche">CC Porte de DrômArdèche</option>';
+            NOM_options_str  += '<option value="CC Porte de Maurienne">CC Porte de Maurienne</option>';
+            NOM_options_str  += '<option value="CC Porte du Jura">CC Porte du Jura</option>';
+            NOM_options_str  += '<option value="CC Portes de la Creuse en Marche">CC Portes de la Creuse en Marche</option>';
+            NOM_options_str  += '<option value="CC Portes du Berry entre Loire et Val d&apos;Aubois">CC Portes du Berry entre Loire et Val d&apos;Aubois</option>';
+            NOM_options_str  += '<option value="CC Presqu&apos;île de Crozon-Aulne maritime">CC Presqu&apos;île de Crozon-Aulne maritime</option>';
+            NOM_options_str  += '<option value="CC Provence Verdon">CC Provence Verdon</option>';
+            NOM_options_str  += '<option value="CC Pré-Bocage Intercom">CC Pré-Bocage Intercom</option>';
+            NOM_options_str  += '<option value="CC Pyrénées Audoises">CC Pyrénées Audoises</option>';
+            NOM_options_str  += '<option value="CC Pyrénées Cerdagne">CC Pyrénées Cerdagne</option>';
+            NOM_options_str  += '<option value="CC Pyrénées Haut Garonnaises">CC Pyrénées Haut Garonnaises</option>';
+            NOM_options_str  += '<option value="CC Pyrénées Vallées des Gaves">CC Pyrénées Vallées des Gaves</option>';
+            NOM_options_str  += '<option value="CC Pyrénées catalanes">CC Pyrénées catalanes</option>';
+            NOM_options_str  += '<option value="CC Périgord-Limousin">CC Périgord-Limousin</option>';
+            NOM_options_str  += '<option value="CC Pévèle-Carembault">CC Pévèle-Carembault</option>';
+            NOM_options_str  += '<option value="CC Quercy - Bouriane">CC Quercy - Bouriane</option>';
+            NOM_options_str  += '<option value="CC Quercy Vert-Aveyron">CC Quercy Vert-Aveyron</option>';
+            NOM_options_str  += '<option value="CC Questembert Communauté">CC Questembert Communauté</option>';
+            NOM_options_str  += '<option value="CC Rahin et Chérimont">CC Rahin et Chérimont</option>';
+            NOM_options_str  += '<option value="CC Randon - Margeride">CC Randon - Margeride</option>';
+            NOM_options_str  += '<option value="CC Retz-en-Valois">CC Retz-en-Valois</option>';
+            NOM_options_str  += '<option value="CC Rhony, Vistre, Vidourle">CC Rhony, Vistre, Vidourle</option>';
+            NOM_options_str  += '<option value="CC Rhône Crussol">CC Rhône Crussol</option>';
+            NOM_options_str  += '<option value="CC Rhône Lez Provence">CC Rhône Lez Provence</option>';
+            NOM_options_str  += '<option value="CC Rives de Moselle">CC Rives de Moselle</option>';
+            NOM_options_str  += '<option value="CC Rives de Saône">CC Rives de Saône</option>';
+            NOM_options_str  += '<option value="CC Rives de l&apos;Ain - Pays du Cerdon">CC Rives de l&apos;Ain - Pays du Cerdon</option>';
+            NOM_options_str  += '<option value="CC Roche aux Fées Communauté">CC Roche aux Fées Communauté</option>';
+            NOM_options_str  += '<option value="CC Roi Morvan Communauté">CC Roi Morvan Communauté</option>';
+            NOM_options_str  += '<option value="CC Roumois Seine">CC Roumois Seine</option>';
+            NOM_options_str  += '<option value="CC Roussillon-Conflent">CC Roussillon-Conflent</option>';
+            NOM_options_str  += '<option value="CC Rumilly Terre de Savoie">CC Rumilly Terre de Savoie</option>';
+            NOM_options_str  += '<option value="CC Région Lézignanaise, Corbières et Minervois">CC Région Lézignanaise, Corbières et Minervois</option>';
+            NOM_options_str  += '<option value="CC Saint Affricain, Roquefort, Sept Vallons">CC Saint Affricain, Roquefort, Sept Vallons</option>';
+            NOM_options_str  += '<option value="CC Saint Cyr Mère Boitier entre Charolais et Mâconnais">CC Saint Cyr Mère Boitier entre Charolais et Mâconnais</option>';
+            NOM_options_str  += '<option value="CC Saint-Flour Communauté">CC Saint-Flour Communauté</option>';
+            NOM_options_str  += '<option value="CC Saint-Marcellin Vercors Isère Communauté">CC Saint-Marcellin Vercors Isère Communauté</option>';
+            NOM_options_str  += '<option value="CC Saint-Pourçain Sioule Limagne">CC Saint-Pourçain Sioule Limagne</option>';
+            NOM_options_str  += '<option value="CC Sarlat-Périgord Noir">CC Sarlat-Périgord Noir</option>';
+            NOM_options_str  += '<option value="CC Sarrebourg Moselle Sud">CC Sarrebourg Moselle Sud</option>';
+            NOM_options_str  += '<option value="CC Sauer-Pechelbronn">CC Sauer-Pechelbronn</option>';
+            NOM_options_str  += '<option value="CC Sauldre et Sologne">CC Sauldre et Sologne</option>';
+            NOM_options_str  += '<option value="CC Sausseron Impressionnistes">CC Sausseron Impressionnistes</option>';
+            NOM_options_str  += '<option value="CC Saône Doubs Bresse">CC Saône Doubs Bresse</option>';
+            NOM_options_str  += '<option value="CC Saône-Beaujolais">CC Saône-Beaujolais</option>';
+            NOM_options_str  += '<option value="CC Seine et Aube">CC Seine et Aube</option>';
+            NOM_options_str  += '<option value="CC Senlis Sud Oise">CC Senlis Sud Oise</option>';
+            NOM_options_str  += '<option value="CC Serein et Armance">CC Serein et Armance</option>';
+            NOM_options_str  += '<option value="CC Serre-Ponçon">CC Serre-Ponçon</option>';
+            NOM_options_str  += '<option value="CC Serre-Ponçon Val d&apos;Avance">CC Serre-Ponçon Val d&apos;Avance</option>';
+            NOM_options_str  += '<option value="CC Seulles Terre et Mer">CC Seulles Terre et Mer</option>';
+            NOM_options_str  += '<option value="CC Sidobre Vals et Plateaux">CC Sidobre Vals et Plateaux</option>';
+            NOM_options_str  += '<option value="CC Somme Sud-Ouest">CC Somme Sud-Ouest</option>';
+            NOM_options_str  += '<option value="CC Spelunca-Liamone">CC Spelunca-Liamone</option>';
+            NOM_options_str  += '<option value="CC Sud Alsace Largue">CC Sud Alsace Largue</option>';
+            NOM_options_str  += '<option value="CC Sud Côte Chalonnaise">CC Sud Côte Chalonnaise</option>';
+            NOM_options_str  += '<option value="CC Sud Nivernais">CC Sud Nivernais</option>';
+            NOM_options_str  += '<option value="CC Sud Retz Atlantique">CC Sud Retz Atlantique</option>';
+            NOM_options_str  += '<option value="CC Sud Sarthe">CC Sud Sarthe</option>';
+            NOM_options_str  += '<option value="CC Sud Vendée Littoral">CC Sud Vendée Littoral</option>';
+            NOM_options_str  += '<option value="CC Sud-Hérault">CC Sud-Hérault</option>';
+            NOM_options_str  += '<option value="CC Sud-Roussillon">CC Sud-Roussillon</option>';
+            NOM_options_str  += '<option value="CC Sumène - Artense">CC Sumène - Artense</option>';
+            NOM_options_str  += '<option value="CC Sundgau">CC Sundgau</option>';
+            NOM_options_str  += '<option value="CC Sèvre et Loire">CC Sèvre et Loire</option>';
+            NOM_options_str  += '<option value="CC Tannay-Brinon-Corbigny">CC Tannay-Brinon-Corbigny</option>';
+            NOM_options_str  += '<option value="CC Tarn-Agout">CC Tarn-Agout</option>';
+            NOM_options_str  += '<option value="CC Terrassonnais Haut Périgord Noir">CC Terrassonnais Haut Périgord Noir</option>';
+            NOM_options_str  += '<option value="CC Terre Lorraine du Longuyonnais">CC Terre Lorraine du Longuyonnais</option>';
+            NOM_options_str  += '<option value="CC Terre d&apos;Auge">CC Terre d&apos;Auge</option>';
+            NOM_options_str  += '<option value="CC Terre d&apos;Eau">CC Terre d&apos;Eau</option>';
+            NOM_options_str  += '<option value="CC Terre d&apos;Émeraude Communauté">CC Terre d&apos;Émeraude Communauté</option>';
+            NOM_options_str  += '<option value="CC Terre de Camargue">CC Terre de Camargue</option>';
+            NOM_options_str  += '<option value="CC Terre de Picardie">CC Terre de Picardie</option>';
+            NOM_options_str  += '<option value="CC Terres Touloises">CC Terres Touloises</option>';
+            NOM_options_str  += '<option value="CC Terres d&apos;Argentan Interco">CC Terres d&apos;Argentan Interco</option>';
+            NOM_options_str  += '<option value="CC Terres de Bresse">CC Terres de Bresse</option>';
+            NOM_options_str  += '<option value="CC Terres de Chalosse">CC Terres de Chalosse</option>';
+            NOM_options_str  += '<option value="CC Terres de Perche">CC Terres de Perche</option>';
+            NOM_options_str  += '<option value="CC Terres de Saône">CC Terres de Saône</option>';
+            NOM_options_str  += '<option value="CC Terres des Confluences">CC Terres des Confluences</option>';
+            NOM_options_str  += '<option value="CC Terres du Haut Berry">CC Terres du Haut Berry</option>';
+            NOM_options_str  += '<option value="CC Territoriale Sud-Luberon">CC Territoriale Sud-Luberon</option>';
+            NOM_options_str  += '<option value="CC Terroir de Caux">CC Terroir de Caux</option>';
+            NOM_options_str  += '<option value="CC Thelloise">CC Thelloise</option>';
+            NOM_options_str  += '<option value="CC Thiers Dore et Montagne">CC Thiers Dore et Montagne</option>';
+            NOM_options_str  += '<option value="CC Thiérache Sambre et Oise">CC Thiérache Sambre et Oise</option>';
+            NOM_options_str  += '<option value="CC Thoré Montagne Noire">CC Thoré Montagne Noire</option>';
+            NOM_options_str  += '<option value="CC Tille et Venelle">CC Tille et Venelle</option>';
+            NOM_options_str  += '<option value="CC Touraine Ouest Val de Loire">CC Touraine Ouest Val de Loire</option>';
+            NOM_options_str  += '<option value="CC Touraine Val de Vienne">CC Touraine Val de Vienne</option>';
+            NOM_options_str  += '<option value="CC Touraine Vallée de l&apos;Indre">CC Touraine Vallée de l&apos;Indre</option>';
+            NOM_options_str  += '<option value="CC Touraine-Est Vallées">CC Touraine-Est Vallées</option>';
+            NOM_options_str  += '<option value="CC Usses et Rhône">CC Usses et Rhône</option>';
+            NOM_options_str  += '<option value="CC Vaison Ventoux">CC Vaison Ventoux</option>';
+            NOM_options_str  += '<option value="CC Val 81">CC Val 81</option>';
+            NOM_options_str  += '<option value="CC Val Briard">CC Val Briard</option>';
+            NOM_options_str  += '<option value="CC Val Eyrieux">CC Val Eyrieux</option>';
+            NOM_options_str  += '<option value="CC Val Guiers">CC Val Guiers</option>';
+            NOM_options_str  += '<option value="CC Val Vanoise">CC Val Vanoise</option>';
+            NOM_options_str  += '<option value="CC Val d&apos;Ille-Aubigné">CC Val d&apos;Ille-Aubigné</option>';
+            NOM_options_str  += '<option value="CC Val de Charente">CC Val de Charente</option>';
+            NOM_options_str  += '<option value="CC Val de Gers">CC Val de Gers</option>';
+            NOM_options_str  += '<option value="CC Val de Gray">CC Val de Gray</option>';
+            NOM_options_str  += '<option value="CC Val de Gâtine">CC Val de Gâtine</option>';
+            NOM_options_str  += '<option value="CC Val de Ligne">CC Val de Ligne</option>';
+            NOM_options_str  += '<option value="CC Val de Meuse - Voie Sacrée">CC Val de Meuse - Voie Sacrée</option>';
+            NOM_options_str  += '<option value="CC Val de Saône Centre">CC Val de Saône Centre</option>';
+            NOM_options_str  += '<option value="CC Val de l&apos;Indre - Brenne">CC Val de l&apos;Indre - Brenne</option>';
+            NOM_options_str  += '<option value="CC Val ès Dunes">CC Val ès Dunes</option>';
+            NOM_options_str  += '<option value="CC Val&apos;Aïgo">CC Val&apos;Aïgo</option>';
+            NOM_options_str  += '<option value="CC Val-de-Cher-Controis">CC Val-de-Cher-Controis</option>';
+            NOM_options_str  += '<option value="CC Vallons de Haute-Bretagne Communauté">CC Vallons de Haute-Bretagne Communauté</option>';
+            NOM_options_str  += '<option value="CC Vallée de l&apos;Hérault">CC Vallée de l&apos;Hérault</option>';
+            NOM_options_str  += '<option value="CC Vallée de l&apos;Ubaye - Serre-Ponçon">CC Vallée de l&apos;Ubaye - Serre-Ponçon</option>';
+            NOM_options_str  += '<option value="CC Vallée de la Dordogne et Forêt Bessède">CC Vallée de la Dordogne et Forêt Bessède</option>';
+            NOM_options_str  += '<option value="CC Vallée des Baux-Alpilles (CC VBA)">CC Vallée des Baux-Alpilles (CC VBA)</option>';
+            NOM_options_str  += '<option value="CC Vallées de l&apos;Orne et de l&apos;Odon">CC Vallées de l&apos;Orne et de l&apos;Odon</option>';
+            NOM_options_str  += '<option value="CC Vallées et Plateau d&apos;Ardenne">CC Vallées et Plateau d&apos;Ardenne</option>';
+            NOM_options_str  += '<option value="CC Vals de Saintonge Communauté">CC Vals de Saintonge Communauté</option>';
+            NOM_options_str  += '<option value="CC Vendée Grand Littoral">CC Vendée Grand Littoral</option>';
+            NOM_options_str  += '<option value="CC Vendée, Sèvre, Autise">CC Vendée, Sèvre, Autise</option>';
+            NOM_options_str  += '<option value="CC Ventoux Sud">CC Ventoux Sud</option>';
+            NOM_options_str  += '<option value="CC Vexin Centre">CC Vexin Centre</option>';
+            NOM_options_str  += '<option value="CC Vienne et Gartempe">CC Vienne et Gartempe</option>';
+            NOM_options_str  += '<option value="CC Vierzon-Sologne-Berry">CC Vierzon-Sologne-Berry</option>';
+            NOM_options_str  += '<option value="CC Vézère-Monédières-Millesources">CC Vézère-Monédières-Millesources</option>';
+            NOM_options_str  += '<option value="CC Xaintrie Val&apos;Dordogne">CC Xaintrie Val&apos;Dordogne</option>';
+            NOM_options_str  += '<option value="CC Yonne Nord">CC Yonne Nord</option>';
+            NOM_options_str  += '<option value="CC Yvetot Normandie">CC Yvetot Normandie</option>';
+            NOM_options_str  += '<option value="CC d&apos;Aire-sur-l&apos;Adour">CC d&apos;Aire-sur-l&apos;Adour</option>';
+            NOM_options_str  += '<option value="CC d&apos;Arcis, Mailly, Ramerupt">CC d&apos;Arcis, Mailly, Ramerupt</option>';
+            NOM_options_str  += '<option value="CC d&apos;Auberive Vingeanne et Montsaugeonnais">CC d&apos;Auberive Vingeanne et Montsaugeonnais</option>';
+            NOM_options_str  += '<option value="CC d&apos;Erdre et Gesvres">CC d&apos;Erdre et Gesvres</option>';
+            NOM_options_str  += '<option value="CC de Bayeux Intercom">CC de Bayeux Intercom</option>';
+            NOM_options_str  += '<option value="CC de Belle-Île-en-Mer">CC de Belle-Île-en-Mer</option>';
+            NOM_options_str  += '<option value="CC de Bièvre Est">CC de Bièvre Est</option>';
+            NOM_options_str  += '<option value="CC de Blaye">CC de Blaye</option>';
+            NOM_options_str  += '<option value="CC de Bénévent Grand Bourg">CC de Bénévent Grand Bourg</option>';
+            NOM_options_str  += '<option value="CC de Calvi Balagne">CC de Calvi Balagne</option>';
+            NOM_options_str  += '<option value="CC de Cattenom et Environs">CC de Cattenom et Environs</option>';
+            NOM_options_str  += '<option value="CC de Charente Limousine">CC de Charente Limousine</option>';
+            NOM_options_str  += '<option value="CC de Commercy - Void - Vaucouleurs">CC de Commercy - Void - Vaucouleurs</option>';
+            NOM_options_str  += '<option value="CC de Cèze Cévennes">CC de Cèze Cévennes</option>';
+            NOM_options_str  += '<option value="CC de Damvillers Spincourt">CC de Damvillers Spincourt</option>';
+            NOM_options_str  += '<option value="CC de Desvres-Samer">CC de Desvres-Samer</option>';
+            NOM_options_str  += '<option value="CC de Domme-Villefranche du Périgord">CC de Domme-Villefranche du Périgord</option>';
+            NOM_options_str  += '<option value="CC de Fium&apos;Orbu Castellu">CC de Fium&apos;Orbu Castellu</option>';
+            NOM_options_str  += '<option value="CC de Flandre Intérieure">CC de Flandre Intérieure</option>';
+            NOM_options_str  += '<option value="CC de Forez-Est">CC de Forez-Est</option>';
+            NOM_options_str  += '<option value="CC de Freyming-Merlebach">CC de Freyming-Merlebach</option>';
+            NOM_options_str  += '<option value="CC de Gevrey-Chambertin et de Nuits-Saint-Georges">CC de Gevrey-Chambertin et de Nuits-Saint-Georges</option>';
+            NOM_options_str  += '<option value="CC de Granville, Terre et Mer">CC de Granville, Terre et Mer</option>';
+            NOM_options_str  += '<option value="CC de Gâtine-Racan">CC de Gâtine-Racan</option>';
+            NOM_options_str  += '<option value="CC de Gémozac et de la Saintonge Viticole">CC de Gémozac et de la Saintonge Viticole</option>';
+            NOM_options_str  += '<option value="CC de Hanau-La Petite Pierre">CC de Hanau-La Petite Pierre</option>';
+            NOM_options_str  += '<option value="CC de Haute Cornouaille">CC de Haute Cornouaille</option>';
+            NOM_options_str  += '<option value="CC de Haute-Tarentaise">CC de Haute-Tarentaise</option>';
+            NOM_options_str  += '<option value="CC de Lacq-Orthez">CC de Lacq-Orthez</option>';
+            NOM_options_str  += '<option value="CC de Londinières">CC de Londinières</option>';
+            NOM_options_str  += '<option value="CC de Lévézou Pareloup">CC de Lévézou Pareloup</option>';
+            NOM_options_str  += '<option value="CC de Marana-Golo">CC de Marana-Golo</option>';
+            NOM_options_str  += '<option value="CC de Marcigny">CC de Marcigny</option>';
+            NOM_options_str  += '<option value="CC de Marie-Galante">CC de Marie-Galante</option>';
+            NOM_options_str  += '<option value="CC de Millau Grands Causses">CC de Millau Grands Causses</option>';
+            NOM_options_str  += '<option value="CC de Mimizan">CC de Mimizan</option>';
+            NOM_options_str  += '<option value="CC de Mirecourt Dompaire">CC de Mirecourt Dompaire</option>';
+            NOM_options_str  += '<option value="CC de Miribel et du Plateau">CC de Miribel et du Plateau</option>';
+            NOM_options_str  += '<option value="CC de Montaigne Montravel et Gurson">CC de Montaigne Montravel et Gurson</option>';
+            NOM_options_str  += '<option value="CC de Montbenoît">CC de Montbenoît</option>';
+            NOM_options_str  += '<option value="CC de Montesquieu">CC de Montesquieu</option>';
+            NOM_options_str  += '<option value="CC de Noblat">CC de Noblat</option>';
+            NOM_options_str  += '<option value="CC de Nozay">CC de Nozay</option>';
+            NOM_options_str  += '<option value="CC de Parthenay-Gâtine">CC de Parthenay-Gâtine</option>';
+            NOM_options_str  += '<option value="CC de Petite Camargue">CC de Petite Camargue</option>';
+            NOM_options_str  += '<option value="CC de Petite-Terre">CC de Petite-Terre</option>';
+            NOM_options_str  += '<option value="CC de Pont-Audemer / Val de Risle">CC de Pont-Audemer / Val de Risle</option>';
+            NOM_options_str  += '<option value="CC de Portes Sud Périgord">CC de Portes Sud Périgord</option>';
+            NOM_options_str  += '<option value="CC de Pouilly-en-Auxois/Bligny-sur-Ouche">CC de Pouilly-en-Auxois/Bligny-sur-Ouche</option>';
+            NOM_options_str  += '<option value="CC de Puisaye-Forterre">CC de Puisaye-Forterre</option>';
+            NOM_options_str  += '<option value="CC de Saint-Méen Montauban">CC de Saint-Méen Montauban</option>';
+            NOM_options_str  += '<option value="CC de Saulieu">CC de Saulieu</option>';
+            NOM_options_str  += '<option value="CC de Seille et Grand Couronné">CC de Seille et Grand Couronné</option>';
+            NOM_options_str  += '<option value="CC de Semur-en-Brionnais">CC de Semur-en-Brionnais</option>';
+            NOM_options_str  += '<option value="CC de Sélestat">CC de Sélestat</option>';
+            NOM_options_str  += '<option value="CC de Sézanne-Sud Ouest Marnais">CC de Sézanne-Sud Ouest Marnais</option>';
+            NOM_options_str  += '<option value="CC de Thann-Cernay">CC de Thann-Cernay</option>';
+            NOM_options_str  += '<option value="CC de Vendeuvre-Soulaines">CC de Vendeuvre-Soulaines</option>';
+            NOM_options_str  += '<option value="CC de Ventadour - Egletons - Monédières">CC de Ventadour - Egletons - Monédières</option>';
+            NOM_options_str  += '<option value="CC de Vezouze en Piémont">CC de Vezouze en Piémont</option>';
+            NOM_options_str  += '<option value="CC de Vie et Boulogne">CC de Vie et Boulogne</option>';
+            NOM_options_str  += '<option value="CC de Villedieu Intercom">CC de Villedieu Intercom</option>';
+            NOM_options_str  += '<option value="CC de Vitry, Champagne et Der">CC de Vitry, Champagne et Der</option>';
+            NOM_options_str  += '<option value="CC de Yenne">CC de Yenne</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Agglomération Migennoise">CC de l&apos;Agglomération Migennoise</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Aillantais en Bourgogne">CC de l&apos;Aillantais en Bourgogne</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Aire Cantilienne">CC de l&apos;Aire Cantilienne</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Aire à l&apos;Argonne">CC de l&apos;Aire à l&apos;Argonne</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Alsace Bossue">CC de l&apos;Alsace Bossue</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Alta Rocca">CC de l&apos;Alta Rocca</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Arc Mosellan">CC de l&apos;Arc Mosellan</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Argonne Ardennaise">CC de l&apos;Argonne Ardennaise</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Argonne Champenoise">CC de l&apos;Argonne Champenoise</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Ernée">CC de l&apos;Ernée</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Est Guyanais">CC de l&apos;Est Guyanais</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Est Lyonnais (CCEL)">CC de l&apos;Est Lyonnais (CCEL)</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Est de la Somme">CC de l&apos;Est de la Somme</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Estuaire">CC de l&apos;Estuaire</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Oisans">CC de l&apos;Oisans</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Oise Picarde">CC de l&apos;Oise Picarde</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Oriente">CC de l&apos;Oriente</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Orvin et de l&apos;Ardusson">CC de l&apos;Orvin et de l&apos;Ardusson</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Ouest Guyanais">CC de l&apos;Ouest Guyanais</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Ouest Vosgien">CC de l&apos;Ouest Vosgien</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Oust à Brocéliande">CC de l&apos;Oust à Brocéliande</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Outre-Forêt">CC de l&apos;Outre-Forêt</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Île d&apos;Oléron">CC de l&apos;Île d&apos;Oléron</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Île de Noirmoutier">CC de l&apos;Île de Noirmoutier</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Île de Ré">CC de l&apos;Île de Ré</option>';
+            NOM_options_str  += '<option value="CC de l&apos;Île-Rousse - Balagne">CC de l&apos;Île-Rousse - Balagne</option>';
+            NOM_options_str  += '<option value="CC de la Baie du Cotentin">CC de la Baie du Cotentin</option>';
+            NOM_options_str  += '<option value="CC de la Basse-Zorn">CC de la Basse-Zorn</option>';
+            NOM_options_str  += '<option value="CC de la Beauce Loirétaine">CC de la Beauce Loirétaine</option>';
+            NOM_options_str  += '<option value="CC de la Brie Champenoise">CC de la Brie Champenoise</option>';
+            NOM_options_str  += '<option value="CC de la Castagniccia-Casinca">CC de la Castagniccia-Casinca</option>';
+            NOM_options_str  += '<option value="CC de la Champagne Conlinoise et du Pays de Sillé">CC de la Champagne Conlinoise et du Pays de Sillé</option>';
+            NOM_options_str  += '<option value="CC de la Champagne Picarde">CC de la Champagne Picarde</option>';
+            NOM_options_str  += '<option value="CC de la Châtaigneraie Cantalienne">CC de la Châtaigneraie Cantalienne</option>';
+            NOM_options_str  += '<option value="CC de la Châtre et Sainte-Sévère">CC de la Châtre et Sainte-Sévère</option>';
+            NOM_options_str  += '<option value="CC de la Cléry, du Betz et de l&apos;Ouanne">CC de la Cléry, du Betz et de l&apos;Ouanne</option>';
+            NOM_options_str  += '<option value="CC de la Costa Verde">CC de la Costa Verde</option>';
+            NOM_options_str  += '<option value="CC de la Côte d&apos;Albâtre">CC de la Côte d&apos;Albâtre</option>';
+            NOM_options_str  += '<option value="CC de la Côtière à Montluel">CC de la Côtière à Montluel</option>';
+            NOM_options_str  += '<option value="CC de la Dombes">CC de la Dombes</option>';
+            NOM_options_str  += '<option value="CC de la Forêt">CC de la Forêt</option>';
+            NOM_options_str  += '<option value="CC de la Gascogne Toulousaine">CC de la Gascogne Toulousaine</option>';
+            NOM_options_str  += '<option value="CC de la Grande Vallée de la Marne">CC de la Grande Vallée de la Marne</option>';
+            NOM_options_str  += '<option value="CC de la Haute Ariège">CC de la Haute Ariège</option>';
+            NOM_options_str  += '<option value="CC de la Haute Comté">CC de la Haute Comté</option>';
+            NOM_options_str  += '<option value="CC de la Haute Saintonge">CC de la Haute Saintonge</option>';
+            NOM_options_str  += '<option value="CC de la Haute Somme (Combles - Péronne - Roisel)">CC de la Haute Somme (Combles - Péronne - Roisel)</option>';
+            NOM_options_str  += '<option value="CC de la Haute Vallée de Chevreuse">CC de la Haute Vallée de Chevreuse</option>';
+            NOM_options_str  += '<option value="CC de la Haute-Bigorre">CC de la Haute-Bigorre</option>';
+            NOM_options_str  += '<option value="CC de la Lomagne Gersoise">CC de la Lomagne Gersoise</option>';
+            NOM_options_str  += '<option value="CC de la Lomagne Tarn-et-Garonnaise">CC de la Lomagne Tarn-et-Garonnaise</option>';
+            NOM_options_str  += '<option value="CC de la Marche Berrichonne">CC de la Marche Berrichonne</option>';
+            NOM_options_str  += '<option value="CC de la Matheysine">CC de la Matheysine</option>';
+            NOM_options_str  += '<option value="CC de la Moivre à la Coole">CC de la Moivre à la Coole</option>';
+            NOM_options_str  += '<option value="CC de la Montagne Noire">CC de la Montagne Noire</option>';
+            NOM_options_str  += '<option value="CC de la Montagne d&apos;Ardèche">CC de la Montagne d&apos;Ardèche</option>';
+            NOM_options_str  += '<option value="CC de la Mossig et du Vignoble">CC de la Mossig et du Vignoble</option>';
+            NOM_options_str  += '<option value="CC de la Muse et des Raspes du Tarn">CC de la Muse et des Raspes du Tarn</option>';
+            NOM_options_str  += '<option value="CC de la Picardie Verte">CC de la Picardie Verte</option>';
+            NOM_options_str  += '<option value="CC de la Pieve de l&apos;Ornano et du Taravo">CC de la Pieve de l&apos;Ornano et du Taravo</option>';
+            NOM_options_str  += '<option value="CC de la Plaine Dijonnaise">CC de la Plaine Dijonnaise</option>';
+            NOM_options_str  += '<option value="CC de la Plaine Jurassienne">CC de la Plaine Jurassienne</option>';
+            NOM_options_str  += '<option value="CC de la Plaine d&apos;Estrées">CC de la Plaine d&apos;Estrées</option>';
+            NOM_options_str  += '<option value="CC de la Plaine de l&apos;Ain">CC de la Plaine de l&apos;Ain</option>';
+            NOM_options_str  += '<option value="CC de la Plaine du Nord Loiret">CC de la Plaine du Nord Loiret</option>';
+            NOM_options_str  += '<option value="CC de la Plaine du Rhin">CC de la Plaine du Rhin</option>';
+            NOM_options_str  += '<option value="CC de la Porte des Vosges Méridionales">CC de la Porte des Vosges Méridionales</option>';
+            NOM_options_str  += '<option value="CC de la Région d&apos;Audruicq">CC de la Région d&apos;Audruicq</option>';
+            NOM_options_str  += '<option value="CC de la Région de Bar-sur-Aube">CC de la Région de Bar-sur-Aube</option>';
+            NOM_options_str  += '<option value="CC de la Région de Guebwiller">CC de la Région de Guebwiller</option>';
+            NOM_options_str  += '<option value="CC de la Région de Molsheim-Mutzig">CC de la Région de Molsheim-Mutzig</option>';
+            NOM_options_str  += '<option value="CC de la Région de Rambervillers">CC de la Région de Rambervillers</option>';
+            NOM_options_str  += '<option value="CC de la Région de Suippes">CC de la Région de Suippes</option>';
+            NOM_options_str  += '<option value="CC de la Sologne des Rivières">CC de la Sologne des Rivières</option>';
+            NOM_options_str  += '<option value="CC de la Sologne des Étangs">CC de la Sologne des Étangs</option>';
+            NOM_options_str  += '<option value="CC de la Station des Rousses-Haut Jura">CC de la Station des Rousses-Haut Jura</option>';
+            NOM_options_str  += '<option value="CC de la Tenarèze">CC de la Tenarèze</option>';
+            NOM_options_str  += '<option value="CC de la Terre des Deux Caps">CC de la Terre des Deux Caps</option>';
+            NOM_options_str  += '<option value="CC de la Thiérache du Centre">CC de la Thiérache du Centre</option>';
+            NOM_options_str  += '<option value="CC de la Vallée Verte">CC de la Vallée Verte</option>';
+            NOM_options_str  += '<option value="CC de la Vallée d&apos;Ossau">CC de la Vallée d&apos;Ossau</option>';
+            NOM_options_str  += '<option value="CC de la Vallée de Chamonix-Mont-Blanc">CC de la Vallée de Chamonix-Mont-Blanc</option>';
+            NOM_options_str  += '<option value="CC de la Vallée de Kaysersberg">CC de la Vallée de Kaysersberg</option>';
+            NOM_options_str  += '<option value="CC de la Vallée de Munster">CC de la Vallée de Munster</option>';
+            NOM_options_str  += '<option value="CC de la Vallée de Saint-Amarin">CC de la Vallée de Saint-Amarin</option>';
+            NOM_options_str  += '<option value="CC de la Vallée de Villé">CC de la Vallée de Villé</option>';
+            NOM_options_str  += '<option value="CC de la Vallée de l&apos;Homme">CC de la Vallée de l&apos;Homme</option>';
+            NOM_options_str  += '<option value="CC de la Vallée de l&apos;Oise et des Trois Forêts">CC de la Vallée de l&apos;Oise et des Trois Forêts</option>';
+            NOM_options_str  += '<option value="CC de la Vallée de la Bruche">CC de la Vallée de la Bruche</option>';
+            NOM_options_str  += '<option value="CC de la Vallée de la Doller et du Soultzbach">CC de la Vallée de la Doller et du Soultzbach</option>';
+            NOM_options_str  += '<option value="CC de la Vallée de la Haute Sarthe">CC de la Vallée de la Haute Sarthe</option>';
+            NOM_options_str  += '<option value="CC de la Vallée du Gapeau">CC de la Vallée du Gapeau</option>';
+            NOM_options_str  += '<option value="CC de la Vallée du Garon (CCVG)">CC de la Vallée du Garon (CCVG)</option>';
+            NOM_options_str  += '<option value="CC de la Vallée du Lot et du Vignoble">CC de la Vallée du Lot et du Vignoble</option>';
+            NOM_options_str  += '<option value="CC de la Vanne et du Pays d&apos;Othe">CC de la Vanne et du Pays d&apos;Othe</option>';
+            NOM_options_str  += '<option value="CC de la Veyle">CC de la Veyle</option>';
+            NOM_options_str  += '<option value="CC des 1000 étangs">CC des 1000 étangs</option>';
+            NOM_options_str  += '<option value="CC des 4B Sud Charente">CC des 4B Sud Charente</option>';
+            NOM_options_str  += '<option value="CC des 7 Vallées">CC des 7 Vallées</option>';
+            NOM_options_str  += '<option value="CC des Albères, de la Côte Vermeille et de l&apos;Illibéris">CC des Albères, de la Côte Vermeille et de l&apos;Illibéris</option>';
+            NOM_options_str  += '<option value="CC des Aspres">CC des Aspres</option>';
+            NOM_options_str  += '<option value="CC des Ballons des Hautes-Vosges">CC des Ballons des Hautes-Vosges</option>';
+            NOM_options_str  += '<option value="CC des Baronnies en Drôme Provençale">CC des Baronnies en Drôme Provençale</option>';
+            NOM_options_str  += '<option value="CC des Bastides Dordogne-Périgord">CC des Bastides Dordogne-Périgord</option>';
+            NOM_options_str  += '<option value="CC des Bastides en Haut Agenais Périgord">CC des Bastides en Haut Agenais Périgord</option>';
+            NOM_options_str  += '<option value="CC des Campagnes de l&apos;Artois">CC des Campagnes de l&apos;Artois</option>';
+            NOM_options_str  += '<option value="CC des Causses à l&apos;Aubrac">CC des Causses à l&apos;Aubrac</option>';
+            NOM_options_str  += '<option value="CC des Collines du Perche">CC des Collines du Perche</option>';
+            NOM_options_str  += '<option value="CC des Collines du Perche Normand">CC des Collines du Perche Normand</option>';
+            NOM_options_str  += '<option value="CC des Combes">CC des Combes</option>';
+            NOM_options_str  += '<option value="CC des Coteaux Arrats Gimone">CC des Coteaux Arrats Gimone</option>';
+            NOM_options_str  += '<option value="CC des Coteaux Bellevue">CC des Coteaux Bellevue</option>';
+            NOM_options_str  += '<option value="CC des Coteaux du Girou">CC des Coteaux du Girou</option>';
+            NOM_options_str  += '<option value="CC des Coteaux du Val d&apos;Arros">CC des Coteaux du Val d&apos;Arros</option>';
+            NOM_options_str  += '<option value="CC des Coteaux et Landes de Gascogne">CC des Coteaux et Landes de Gascogne</option>';
+            NOM_options_str  += '<option value="CC des Coëvrons">CC des Coëvrons</option>';
+            NOM_options_str  += '<option value="CC des Crêtes Préardennaises">CC des Crêtes Préardennaises</option>';
+            NOM_options_str  += '<option value="CC des Cévennes Gangeoises et Suménoises">CC des Cévennes Gangeoises et Suménoises</option>';
+            NOM_options_str  += '<option value="CC des Cévennes au Mont Lozère">CC des Cévennes au Mont Lozère</option>';
+            NOM_options_str  += '<option value="CC des Deux Morin">CC des Deux Morin</option>';
+            NOM_options_str  += '<option value="CC des Deux Rives">CC des Deux Rives</option>';
+            NOM_options_str  += '<option value="CC des Deux Vallées">CC des Deux Vallées</option>';
+            NOM_options_str  += '<option value="CC des Deux Vallées Vertes">CC des Deux Vallées Vertes</option>';
+            NOM_options_str  += '<option value="CC des Forêts du Perche">CC des Forêts du Perche</option>';
+            NOM_options_str  += '<option value="CC des Gorges de l&apos;Ardèche">CC des Gorges de l&apos;Ardèche</option>';
+            NOM_options_str  += '<option value="CC des Grands Lacs">CC des Grands Lacs</option>';
+            NOM_options_str  += '<option value="CC des Hautes Terres de l&apos;Aubrac">CC des Hautes Terres de l&apos;Aubrac</option>';
+            NOM_options_str  += '<option value="CC des Hautes Vosges">CC des Hautes Vosges</option>';
+            NOM_options_str  += '<option value="CC des Hauts de Flandre">CC des Hauts de Flandre</option>';
+            NOM_options_str  += '<option value="CC des Hauts du Perche">CC des Hauts du Perche</option>';
+            NOM_options_str  += '<option value="CC des Hauts du Val de Saône">CC des Hauts du Val de Saône</option>';
+            NOM_options_str  += '<option value="CC des Hauts-Tolosans">CC des Hauts-Tolosans</option>';
+            NOM_options_str  += '<option value="CC des Lacs de Champagne">CC des Lacs de Champagne</option>';
+            NOM_options_str  += '<option value="CC des Lacs et Montagnes du Haut-Doubs">CC des Lacs et Montagnes du Haut-Doubs</option>';
+            NOM_options_str  += '<option value="CC des Landes d&apos;Armagnac">CC des Landes d&apos;Armagnac</option>';
+            NOM_options_str  += '<option value="CC des Lisières de l&apos;Oise">CC des Lisières de l&apos;Oise</option>';
+            NOM_options_str  += '<option value="CC des Loges">CC des Loges</option>';
+            NOM_options_str  += '<option value="CC des Luys en Béarn">CC des Luys en Béarn</option>';
+            NOM_options_str  += '<option value="CC des Montagnes du Giffre">CC des Montagnes du Giffre</option>';
+            NOM_options_str  += '<option value="CC des Monts d&apos;Alban et du Villefranchois">CC des Monts d&apos;Alban et du Villefranchois</option>';
+            NOM_options_str  += '<option value="CC des Monts de Gy">CC des Monts de Gy</option>';
+            NOM_options_str  += '<option value="CC des Monts de Lacaune et de la Montagne du Haut Languedoc">CC des Monts de Lacaune et de la Montagne du Haut Languedoc</option>';
+            NOM_options_str  += '<option value="CC des Monts du Lyonnais">CC des Monts du Lyonnais</option>';
+            NOM_options_str  += '<option value="CC des Monts du Pilat">CC des Monts du Pilat</option>';
+            NOM_options_str  += '<option value="CC des Pays d&apos;Oise et d&apos;Halatte">CC des Pays d&apos;Oise et d&apos;Halatte</option>';
+            NOM_options_str  += '<option value="CC des Pays de Cayres et de Pradelles">CC des Pays de Cayres et de Pradelles</option>';
+            NOM_options_str  += '<option value="CC des Pays de L&apos;Aigle">CC des Pays de L&apos;Aigle</option>';
+            NOM_options_str  += '<option value="CC des Pays du Sel et du Vermois">CC des Pays du Sel et du Vermois</option>';
+            NOM_options_str  += '<option value="CC des Paysages de la Champagne">CC des Paysages de la Champagne</option>';
+            NOM_options_str  += '<option value="CC des Portes Euréliennes d&apos;Île-de-France">CC des Portes Euréliennes d&apos;Île-de-France</option>';
+            NOM_options_str  += '<option value="CC des Portes d&apos;Ariège Pyrénées">CC des Portes d&apos;Ariège Pyrénées</option>';
+            NOM_options_str  += '<option value="CC des Portes de Meuse">CC des Portes de Meuse</option>';
+            NOM_options_str  += '<option value="CC des Portes de Romilly-sur-Seine">CC des Portes de Romilly-sur-Seine</option>';
+            NOM_options_str  += '<option value="CC des Portes de Rosheim">CC des Portes de Rosheim</option>';
+            NOM_options_str  += '<option value="CC des Portes de Sologne">CC des Portes de Sologne</option>';
+            NOM_options_str  += '<option value="CC des Portes de Vassivière">CC des Portes de Vassivière</option>';
+            NOM_options_str  += '<option value="CC des Portes de l&apos;Entre-Deux-Mers">CC des Portes de l&apos;Entre-Deux-Mers</option>';
+            NOM_options_str  += '<option value="CC des Portes de la Thiérache">CC des Portes de la Thiérache</option>';
+            NOM_options_str  += '<option value="CC des Portes du Haut-Doubs">CC des Portes du Haut-Doubs</option>';
+            NOM_options_str  += '<option value="CC des Portes du Luxembourg">CC des Portes du Luxembourg</option>';
+            NOM_options_str  += '<option value="CC des Quatre Rivières">CC des Quatre Rivières</option>';
+            NOM_options_str  += '<option value="CC des Quatre Rivières en Bray">CC des Quatre Rivières en Bray</option>';
+            NOM_options_str  += '<option value="CC des Quatre Vallées">CC des Quatre Vallées</option>';
+            NOM_options_str  += '<option value="CC des Rives du Haut Allier">CC des Rives du Haut Allier</option>';
+            NOM_options_str  += '<option value="CC des Sablons">CC des Sablons</option>';
+            NOM_options_str  += '<option value="CC des Savanes">CC des Savanes</option>';
+            NOM_options_str  += '<option value="CC des Savoir-Faire">CC des Savoir-Faire</option>';
+            NOM_options_str  += '<option value="CC des Sources de l&apos;Orne">CC des Sources de l&apos;Orne</option>';
+            NOM_options_str  += '<option value="CC des Sources du Lac d&apos;Annecy">CC des Sources du Lac d&apos;Annecy</option>';
+            NOM_options_str  += '<option value="CC des Sucs">CC des Sucs</option>';
+            NOM_options_str  += '<option value="CC des Terres d&apos;Apcher-Margeride-Aubrac">CC des Terres d&apos;Apcher-Margeride-Aubrac</option>';
+            NOM_options_str  += '<option value="CC des Terres d&apos;Auxois">CC des Terres d&apos;Auxois</option>';
+            NOM_options_str  += '<option value="CC des Terres du Lauragais">CC des Terres du Lauragais</option>';
+            NOM_options_str  += '<option value="CC des Terres du Val de Loire">CC des Terres du Val de Loire</option>';
+            NOM_options_str  += '<option value="CC des Trois Forêts">CC des Trois Forêts</option>';
+            NOM_options_str  += '<option value="CC des Trois Rivières">CC des Trois Rivières</option>';
+            NOM_options_str  += '<option value="CC des Vallons du Lyonnais (CCVL)">CC des Vallons du Lyonnais (CCVL)</option>';
+            NOM_options_str  += '<option value="CC des Vallées d&apos;Aigueblanche">CC des Vallées d&apos;Aigueblanche</option>';
+            NOM_options_str  += '<option value="CC des Vallées d&apos;Auge et du Merlerault">CC des Vallées d&apos;Auge et du Merlerault</option>';
+            NOM_options_str  += '<option value="CC des Vallées de Thônes">CC des Vallées de Thônes</option>';
+            NOM_options_str  += '<option value="CC des Vallées de la Braye et de l&apos;Anille">CC des Vallées de la Braye et de l&apos;Anille</option>';
+            NOM_options_str  += '<option value="CC des Vallées de la Tille et de l&apos;Ignon">CC des Vallées de la Tille et de l&apos;Ignon</option>';
+            NOM_options_str  += '<option value="CC des Vallées du Clain">CC des Vallées du Clain</option>';
+            NOM_options_str  += '<option value="CC des Vallées du Haut-Anjou">CC des Vallées du Haut-Anjou</option>';
+            NOM_options_str  += '<option value="CC des Vals d&apos;Aix et Isable">CC des Vals d&apos;Aix et Isable</option>';
+            NOM_options_str  += '<option value="CC des Villes Sœurs">CC des Villes Sœurs</option>';
+            NOM_options_str  += '<option value="CC des Vosges côté Sud Ouest">CC des Vosges côté Sud Ouest</option>';
+            NOM_options_str  += '<option value="CC des Vosges du Sud">CC des Vosges du Sud</option>';
+            NOM_options_str  += '<option value="CC du Barséquanais en Champagne">CC du Barséquanais en Champagne</option>';
+            NOM_options_str  += '<option value="CC du Bas Armagnac">CC du Bas Armagnac</option>';
+            NOM_options_str  += '<option value="CC du Bassin Auterivain Haut-Garonnais">CC du Bassin Auterivain Haut-Garonnais</option>';
+            NOM_options_str  += '<option value="CC du Bassin d&apos;Aubenas">CC du Bassin d&apos;Aubenas</option>';
+            NOM_options_str  += '<option value="CC du Bassin de Joinville en Champagne">CC du Bassin de Joinville en Champagne</option>';
+            NOM_options_str  += '<option value="CC du Bassin de Marennes">CC du Bassin de Marennes</option>';
+            NOM_options_str  += '<option value="CC du Bassin de Pompey">CC du Bassin de Pompey</option>';
+            NOM_options_str  += '<option value="CC du Bassin de Pont-à-Mousson">CC du Bassin de Pont-à-Mousson</option>';
+            NOM_options_str  += '<option value="CC du Bazadais">CC du Bazadais</option>';
+            NOM_options_str  += '<option value="CC du Bocage Bourbonnais">CC du Bocage Bourbonnais</option>';
+            NOM_options_str  += '<option value="CC du Bocage Mayennais">CC du Bocage Mayennais</option>';
+            NOM_options_str  += '<option value="CC du Bonnevalais">CC du Bonnevalais</option>';
+            NOM_options_str  += '<option value="CC du Briançonnais">CC du Briançonnais</option>';
+            NOM_options_str  += '<option value="CC du Béarn des Gaves">CC du Béarn des Gaves</option>';
+            NOM_options_str  += '<option value="CC du Canton d&apos;Erstein">CC du Canton d&apos;Erstein</option>';
+            NOM_options_str  += '<option value="CC du Canton d&apos;Oulchy-le-Château">CC du Canton d&apos;Oulchy-le-Château</option>';
+            NOM_options_str  += '<option value="CC du Canton de Charly-sur-Marne">CC du Canton de Charly-sur-Marne</option>';
+            NOM_options_str  += '<option value="CC du Canton de La Chambre">CC du Canton de La Chambre</option>';
+            NOM_options_str  += '<option value="CC du Cap Corse">CC du Cap Corse</option>';
+            NOM_options_str  += '<option value="CC du Castelrenaudais">CC du Castelrenaudais</option>';
+            NOM_options_str  += '<option value="CC du Causse de Labastide-Murat">CC du Causse de Labastide-Murat</option>';
+            NOM_options_str  += '<option value="CC du Centre Corse">CC du Centre Corse</option>';
+            NOM_options_str  += '<option value="CC du Centre du Haut-Rhin">CC du Centre du Haut-Rhin</option>';
+            NOM_options_str  += '<option value="CC du Centre-Ouest">CC du Centre-Ouest</option>';
+            NOM_options_str  += '<option value="CC du Chaourçois et du Val d&apos;Armance">CC du Chaourçois et du Val d&apos;Armance</option>';
+            NOM_options_str  += '<option value="CC du Chemin des Dames">CC du Chemin des Dames</option>';
+            NOM_options_str  += '<option value="CC du Châtillonnais en Berry">CC du Châtillonnais en Berry</option>';
+            NOM_options_str  += '<option value="CC du Civraisien en Poitou">CC du Civraisien en Poitou</option>';
+            NOM_options_str  += '<option value="CC du Clermontais">CC du Clermontais</option>';
+            NOM_options_str  += '<option value="CC du Clermontois">CC du Clermontois</option>';
+            NOM_options_str  += '<option value="CC du Clunisois">CC du Clunisois</option>';
+            NOM_options_str  += '<option value="CC du Confluent et des Coteaux de Prayssas">CC du Confluent et des Coteaux de Prayssas</option>';
+            NOM_options_str  += '<option value="CC du Cordais et du Causse (4 C)">CC du Cordais et du Causse (4 C)</option>';
+            NOM_options_str  += '<option value="CC du Crestois et de Pays de Saillans Cœur de Drôme">CC du Crestois et de Pays de Saillans Cœur de Drôme</option>';
+            NOM_options_str  += '<option value="CC du Créonnais">CC du Créonnais</option>';
+            NOM_options_str  += '<option value="CC du Diois">CC du Diois</option>';
+            NOM_options_str  += '<option value="CC du District Urbain de Faulquemont">CC du District Urbain de Faulquemont</option>';
+            NOM_options_str  += '<option value="CC du Doubs Baumois">CC du Doubs Baumois</option>';
+            NOM_options_str  += '<option value="CC du Dunois">CC du Dunois</option>';
+            NOM_options_str  += '<option value="CC du Fronsadais">CC du Fronsadais</option>';
+            NOM_options_str  += '<option value="CC du Frontonnais">CC du Frontonnais</option>';
+            NOM_options_str  += '<option value="CC du Genevois">CC du Genevois</option>';
+            NOM_options_str  += '<option value="CC du Golfe de Saint-Tropez">CC du Golfe de Saint-Tropez</option>';
+            NOM_options_str  += '<option value="CC du Grand Armagnac">CC du Grand Armagnac</option>';
+            NOM_options_str  += '<option value="CC du Grand Autunois Morvan">CC du Grand Autunois Morvan</option>';
+            NOM_options_str  += '<option value="CC du Grand Chambord">CC du Grand Chambord</option>';
+            NOM_options_str  += '<option value="CC du Grand Châteaudun">CC du Grand Châteaudun</option>';
+            NOM_options_str  += '<option value="CC du Grand Cubzaguais">CC du Grand Cubzaguais</option>';
+            NOM_options_str  += '<option value="CC du Grand Langres">CC du Grand Langres</option>';
+            NOM_options_str  += '<option value="CC du Grand Pic Saint-Loup">CC du Grand Pic Saint-Loup</option>';
+            NOM_options_str  += '<option value="CC du Grand Pontarlier">CC du Grand Pontarlier</option>';
+            NOM_options_str  += '<option value="CC du Grand Roye">CC du Grand Roye</option>';
+            NOM_options_str  += '<option value="CC du Grand Saint-Émilionnais">CC du Grand Saint-Émilionnais</option>';
+            NOM_options_str  += '<option value="CC du Guillestrois et du Queyras">CC du Guillestrois et du Queyras</option>';
+            NOM_options_str  += '<option value="CC du Gâtinais en Bourgogne">CC du Gâtinais en Bourgogne</option>';
+            NOM_options_str  += '<option value="CC du Gévaudan">CC du Gévaudan</option>';
+            NOM_options_str  += '<option value="CC du Haut Allier Margeride">CC du Haut Allier Margeride</option>';
+            NOM_options_str  += '<option value="CC du Haut Béarn">CC du Haut Béarn</option>';
+            NOM_options_str  += '<option value="CC du Haut Pays Bigouden">CC du Haut Pays Bigouden</option>';
+            NOM_options_str  += '<option value="CC du Haut Pays du Montreuillois">CC du Haut Pays du Montreuillois</option>';
+            NOM_options_str  += '<option value="CC du Haut Pays du Velay communauté">CC du Haut Pays du Velay communauté</option>';
+            NOM_options_str  += '<option value="CC du Haut Val d&apos;Oise">CC du Haut Val d&apos;Oise</option>';
+            NOM_options_str  += '<option value="CC du Haut Vallespir">CC du Haut Vallespir</option>';
+            NOM_options_str  += '<option value="CC du Haut-Chablais">CC du Haut-Chablais</option>';
+            NOM_options_str  += '<option value="CC du Haut-Lignon">CC du Haut-Lignon</option>';
+            NOM_options_str  += '<option value="CC du Haut-Poitou">CC du Haut-Poitou</option>';
+            NOM_options_str  += '<option value="CC du Jovinien">CC du Jovinien</option>';
+            NOM_options_str  += '<option value="CC du Kochersberg">CC du Kochersberg</option>';
+            NOM_options_str  += '<option value="CC du Kreiz-Breizh (CCKB)">CC du Kreiz-Breizh (CCKB)</option>';
+            NOM_options_str  += '<option value="CC du Lac d&apos;Aiguebelette (CCLA)">CC du Lac d&apos;Aiguebelette (CCLA)</option>';
+            NOM_options_str  += '<option value="CC du Lautrécois et du Pays d&apos;Agout">CC du Lautrécois et du Pays d&apos;Agout</option>';
+            NOM_options_str  += '<option value="CC du Liancourtois">CC du Liancourtois</option>';
+            NOM_options_str  += '<option value="CC du Limouxin">CC du Limouxin</option>';
+            NOM_options_str  += '<option value="CC du Massif du Sancy">CC du Massif du Sancy</option>';
+            NOM_options_str  += '<option value="CC du Massif du Vercors">CC du Massif du Vercors</option>';
+            NOM_options_str  += '<option value="CC du Minervois au Caroux">CC du Minervois au Caroux</option>';
+            NOM_options_str  += '<option value="CC du Mont des Avaloirs">CC du Mont des Avaloirs</option>';
+            NOM_options_str  += '<option value="CC du Montbardois">CC du Montbardois</option>';
+            NOM_options_str  += '<option value="CC du Nivernais Bourbonnais">CC du Nivernais Bourbonnais</option>';
+            NOM_options_str  += '<option value="CC du Nogentais">CC du Nogentais</option>';
+            NOM_options_str  += '<option value="CC du Nord Est Béarn">CC du Nord Est Béarn</option>';
+            NOM_options_str  += '<option value="CC du Pays Arnay Liernais">CC du Pays Arnay Liernais</option>';
+            NOM_options_str  += '<option value="CC du Pays Beaume-Drobie">CC du Pays Beaume-Drobie</option>';
+            NOM_options_str  += '<option value="CC du Pays Bigouden Sud">CC du Pays Bigouden Sud</option>';
+            NOM_options_str  += '<option value="CC du Pays Châtillonnais">CC du Pays Châtillonnais</option>';
+            NOM_options_str  += '<option value="CC du Pays Dunois">CC du Pays Dunois</option>';
+            NOM_options_str  += '<option value="CC du Pays Fertois et du Bocage Carrougien">CC du Pays Fertois et du Bocage Carrougien</option>';
+            NOM_options_str  += '<option value="CC du Pays Fléchois">CC du Pays Fléchois</option>';
+            NOM_options_str  += '<option value="CC du Pays Fouesnantais">CC du Pays Fouesnantais</option>';
+            NOM_options_str  += '<option value="CC du Pays Foyen">CC du Pays Foyen</option>';
+            NOM_options_str  += '<option value="CC du Pays Gentiane">CC du Pays Gentiane</option>';
+            NOM_options_str  += '<option value="CC du Pays Grenadois">CC du Pays Grenadois</option>';
+            NOM_options_str  += '<option value="CC du Pays Haut Val d&apos;Alzette">CC du Pays Haut Val d&apos;Alzette</option>';
+            NOM_options_str  += '<option value="CC du Pays Houdanais (CCPH)">CC du Pays Houdanais (CCPH)</option>';
+            NOM_options_str  += '<option value="CC du Pays Loudunais">CC du Pays Loudunais</option>';
+            NOM_options_str  += '<option value="CC du Pays Morcenais">CC du Pays Morcenais</option>';
+            NOM_options_str  += '<option value="CC du Pays Mornantais (COPAMO)">CC du Pays Mornantais (COPAMO)</option>';
+            NOM_options_str  += '<option value="CC du Pays Noyonnais">CC du Pays Noyonnais</option>';
+            NOM_options_str  += '<option value="CC du Pays Orne Moselle">CC du Pays Orne Moselle</option>';
+            NOM_options_str  += '<option value="CC du Pays Rethélois">CC du Pays Rethélois</option>';
+            NOM_options_str  += '<option value="CC du Pays Rhénan">CC du Pays Rhénan</option>';
+            NOM_options_str  += '<option value="CC du Pays Rignacois">CC du Pays Rignacois</option>';
+            NOM_options_str  += '<option value="CC du Pays Riolais">CC du Pays Riolais</option>';
+            NOM_options_str  += '<option value="CC du Pays Rochois">CC du Pays Rochois</option>';
+            NOM_options_str  += '<option value="CC du Pays Sabolien">CC du Pays Sabolien</option>';
+            NOM_options_str  += '<option value="CC du Pays Solesmois">CC du Pays Solesmois</option>';
+            NOM_options_str  += '<option value="CC du Pays Sostranien">CC du Pays Sostranien</option>';
+            NOM_options_str  += '<option value="CC du Pays Tarusate">CC du Pays Tarusate</option>';
+            NOM_options_str  += '<option value="CC du Pays Valserhône (CCTV)">CC du Pays Valserhône (CCTV)</option>';
+            NOM_options_str  += '<option value="CC du Pays Viganais">CC du Pays Viganais</option>';
+            NOM_options_str  += '<option value="CC du Pays d&apos;Alésia et de la Seine">CC du Pays d&apos;Alésia et de la Seine</option>';
+            NOM_options_str  += '<option value="CC du Pays d&apos;Ancenis">CC du Pays d&apos;Ancenis</option>';
+            NOM_options_str  += '<option value="CC du Pays d&apos;Huriel">CC du Pays d&apos;Huriel</option>';
+            NOM_options_str  += '<option value="CC du Pays d&apos;Héricourt">CC du Pays d&apos;Héricourt</option>';
+            NOM_options_str  += '<option value="CC du Pays d&apos;Iroise">CC du Pays d&apos;Iroise</option>';
+            NOM_options_str  += '<option value="CC du Pays d&apos;Issoudun">CC du Pays d&apos;Issoudun</option>';
+            NOM_options_str  += '<option value="CC du Pays d&apos;Olmes">CC du Pays d&apos;Olmes</option>';
+            NOM_options_str  += '<option value="CC du Pays d&apos;Othe">CC du Pays d&apos;Othe</option>';
+            NOM_options_str  += '<option value="CC du Pays d&apos;Urfé">CC du Pays d&apos;Urfé</option>';
+            NOM_options_str  += '<option value="CC du Pays d&apos;Uzerche">CC du Pays d&apos;Uzerche</option>';
+            NOM_options_str  += '<option value="CC du Pays d&apos;Étain">CC du Pays d&apos;Étain</option>';
+            NOM_options_str  += '<option value="CC du Pays de Barr">CC du Pays de Barr</option>';
+            NOM_options_str  += '<option value="CC du Pays de Bitche">CC du Pays de Bitche</option>';
+            NOM_options_str  += '<option value="CC du Pays de Bray">CC du Pays de Bray</option>';
+            NOM_options_str  += '<option value="CC du Pays de Château-Gontier">CC du Pays de Château-Gontier</option>';
+            NOM_options_str  += '<option value="CC du Pays de Colombey et du Sud Toulois">CC du Pays de Colombey et du Sud Toulois</option>';
+            NOM_options_str  += '<option value="CC du Pays de Conches">CC du Pays de Conches</option>';
+            NOM_options_str  += '<option value="CC du Pays de Craon">CC du Pays de Craon</option>';
+            NOM_options_str  += '<option value="CC du Pays de Cruseilles">CC du Pays de Cruseilles</option>';
+            NOM_options_str  += '<option value="CC du Pays de Dol et de la Baie du Mont Saint-Michel">CC du Pays de Dol et de la Baie du Mont Saint-Michel</option>';
+            NOM_options_str  += '<option value="CC du Pays de Duras">CC du Pays de Duras</option>';
+            NOM_options_str  += '<option value="CC du Pays de Falaise">CC du Pays de Falaise</option>';
+            NOM_options_str  += '<option value="CC du Pays de Fayence">CC du Pays de Fayence</option>';
+            NOM_options_str  += '<option value="CC du Pays de Fénelon">CC du Pays de Fénelon</option>';
+            NOM_options_str  += '<option value="CC du Pays de Honfleur-Beuzeville">CC du Pays de Honfleur-Beuzeville</option>';
+            NOM_options_str  += '<option value="CC du Pays de Lafrançaise">CC du Pays de Lafrançaise</option>';
+            NOM_options_str  += '<option value="CC du Pays de Lalbenque-Limogne">CC du Pays de Lalbenque-Limogne</option>';
+            NOM_options_str  += '<option value="CC du Pays de Lamastre">CC du Pays de Lamastre</option>';
+            NOM_options_str  += '<option value="CC du Pays de Landivisiau">CC du Pays de Landivisiau</option>';
+            NOM_options_str  += '<option value="CC du Pays de Lapalisse">CC du Pays de Lapalisse</option>';
+            NOM_options_str  += '<option value="CC du Pays de Lauzun">CC du Pays de Lauzun</option>';
+            NOM_options_str  += '<option value="CC du Pays de Limours (CCPL)">CC du Pays de Limours (CCPL)</option>';
+            NOM_options_str  += '<option value="CC du Pays de Lubersac-Pompadour">CC du Pays de Lubersac-Pompadour</option>';
+            NOM_options_str  += '<option value="CC du Pays de Lumbres">CC du Pays de Lumbres</option>';
+            NOM_options_str  += '<option value="CC du Pays de Lure">CC du Pays de Lure</option>';
+            NOM_options_str  += '<option value="CC du Pays de Luxeuil">CC du Pays de Luxeuil</option>';
+            NOM_options_str  += '<option value="CC du Pays de Mauriac">CC du Pays de Mauriac</option>';
+            NOM_options_str  += '<option value="CC du Pays de Maîche">CC du Pays de Maîche</option>';
+            NOM_options_str  += '<option value="CC du Pays de Meslay-Grez">CC du Pays de Meslay-Grez</option>';
+            NOM_options_str  += '<option value="CC du Pays de Mirepoix">CC du Pays de Mirepoix</option>';
+            NOM_options_str  += '<option value="CC du Pays de Montbozon et du Chanois">CC du Pays de Montbozon et du Chanois</option>';
+            NOM_options_str  += '<option value="CC du Pays de Montmédy">CC du Pays de Montmédy</option>';
+            NOM_options_str  += '<option value="CC du Pays de Mormal">CC du Pays de Mormal</option>';
+            NOM_options_str  += '<option value="CC du Pays de Mortagne">CC du Pays de Mortagne</option>';
+            NOM_options_str  += '<option value="CC du Pays de Mortagne-au-Perche">CC du Pays de Mortagne-au-Perche</option>';
+            NOM_options_str  += '<option value="CC du Pays de Niederbronn-les-Bains">CC du Pays de Niederbronn-les-Bains</option>';
+            NOM_options_str  += '<option value="CC du Pays de Phalsbourg">CC du Pays de Phalsbourg</option>';
+            NOM_options_str  += '<option value="CC du Pays de Pontchâteau Saint-Gildas-des-Bois">CC du Pays de Pontchâteau Saint-Gildas-des-Bois</option>';
+            NOM_options_str  += '<option value="CC du Pays de Pouzauges">CC du Pays de Pouzauges</option>';
+            NOM_options_str  += '<option value="CC du Pays de Revigny-sur-Ornain">CC du Pays de Revigny-sur-Ornain</option>';
+            NOM_options_str  += '<option value="CC du Pays de Ribeauvillé">CC du Pays de Ribeauvillé</option>';
+            NOM_options_str  += '<option value="CC du Pays de Rouffach, Vignobles et Châteaux">CC du Pays de Rouffach, Vignobles et Châteaux</option>';
+            NOM_options_str  += '<option value="CC du Pays de Saint-Aulaye">CC du Pays de Saint-Aulaye</option>';
+            NOM_options_str  += '<option value="CC du Pays de Saint-Fulgent - Les Essarts">CC du Pays de Saint-Fulgent - Les Essarts</option>';
+            NOM_options_str  += '<option value="CC du Pays de Saint-Yrieix">CC du Pays de Saint-Yrieix</option>';
+            NOM_options_str  += '<option value="CC du Pays de Saint-Éloy">CC du Pays de Saint-Éloy</option>';
+            NOM_options_str  += '<option value="CC du Pays de Sainte-Odile">CC du Pays de Sainte-Odile</option>';
+            NOM_options_str  += '<option value="CC du Pays de Salars">CC du Pays de Salars</option>';
+            NOM_options_str  += '<option value="CC du Pays de Salers">CC du Pays de Salers</option>';
+            NOM_options_str  += '<option value="CC du Pays de Sancey-Belleherbe">CC du Pays de Sancey-Belleherbe</option>';
+            NOM_options_str  += '<option value="CC du Pays de Saverne">CC du Pays de Saverne</option>';
+            NOM_options_str  += '<option value="CC du Pays de Serres en Quercy">CC du Pays de Serres en Quercy</option>';
+            NOM_options_str  += '<option value="CC du Pays de Sommières">CC du Pays de Sommières</option>';
+            NOM_options_str  += '<option value="CC du Pays de Stenay et du Val Dunois">CC du Pays de Stenay et du Val Dunois</option>';
+            NOM_options_str  += '<option value="CC du Pays de Tarascon">CC du Pays de Tarascon</option>';
+            NOM_options_str  += '<option value="CC du Pays de Trie et du Magnoac">CC du Pays de Trie et du Magnoac</option>';
+            NOM_options_str  += '<option value="CC du Pays de Tronçais">CC du Pays de Tronçais</option>';
+            NOM_options_str  += '<option value="CC du Pays de Valois">CC du Pays de Valois</option>';
+            NOM_options_str  += '<option value="CC du Pays de Villeneuve en Armagnac Landais">CC du Pays de Villeneuve en Armagnac Landais</option>';
+            NOM_options_str  += '<option value="CC du Pays de Villersexel">CC du Pays de Villersexel</option>';
+            NOM_options_str  += '<option value="CC du Pays de Wissembourg">CC du Pays de Wissembourg</option>';
+            NOM_options_str  += '<option value="CC du Pays de l&apos;Arbresle (CCPA)">CC du Pays de l&apos;Arbresle (CCPA)</option>';
+            NOM_options_str  += '<option value="CC du Pays de l&apos;Huisne Sarthoise">CC du Pays de l&apos;Huisne Sarthoise</option>';
+            NOM_options_str  += '<option value="CC du Pays de l&apos;Ourcq">CC du Pays de l&apos;Ourcq</option>';
+            NOM_options_str  += '<option value="CC du Pays de l&apos;Ozon">CC du Pays de l&apos;Ozon</option>';
+            NOM_options_str  += '<option value="CC du Pays de la Châtaigneraie">CC du Pays de la Châtaigneraie</option>';
+            NOM_options_str  += '<option value="CC du Pays de la Serre">CC du Pays de la Serre</option>';
+            NOM_options_str  += '<option value="CC du Pays de la Zorn">CC du Pays de la Zorn</option>';
+            NOM_options_str  += '<option value="CC du Pays des Abers">CC du Pays des Abers</option>';
+            NOM_options_str  += '<option value="CC du Pays des Achards">CC du Pays des Achards</option>';
+            NOM_options_str  += '<option value="CC du Pays des Ecrins">CC du Pays des Ecrins</option>';
+            NOM_options_str  += '<option value="CC du Pays des Herbiers">CC du Pays des Herbiers</option>';
+            NOM_options_str  += '<option value="CC du Pays des Paillons">CC du Pays des Paillons</option>';
+            NOM_options_str  += '<option value="CC du Pays des Sorgues et des Monts de Vaucluse">CC du Pays des Sorgues et des Monts de Vaucluse</option>';
+            NOM_options_str  += '<option value="CC du Pays des Sources">CC du Pays des Sources</option>';
+            NOM_options_str  += '<option value="CC du Pays du Coquelicot">CC du Pays du Coquelicot</option>';
+            NOM_options_str  += '<option value="CC du Pays du Neubourg">CC du Pays du Neubourg</option>';
+            NOM_options_str  += '<option value="CC du Pays du Saintois">CC du Pays du Saintois</option>';
+            NOM_options_str  += '<option value="CC du Pays du Sanon">CC du Pays du Sanon</option>';
+            NOM_options_str  += '<option value="CC du Pays du Vermandois">CC du Pays du Vermandois</option>';
+            NOM_options_str  += '<option value="CC du Pays entre Loire et Rhône">CC du Pays entre Loire et Rhône</option>';
+            NOM_options_str  += '<option value="CC du Perche">CC du Perche</option>';
+            NOM_options_str  += '<option value="CC du Perche et Haut Vendômois">CC du Perche et Haut Vendômois</option>';
+            NOM_options_str  += '<option value="CC du Pilat Rhodanien">CC du Pilat Rhodanien</option>';
+            NOM_options_str  += '<option value="CC du Pithiverais">CC du Pithiverais</option>';
+            NOM_options_str  += '<option value="CC du Pithiverais-Gâtinais">CC du Pithiverais-Gâtinais</option>';
+            NOM_options_str  += '<option value="CC du Piémont Cévenol">CC du Piémont Cévenol</option>';
+            NOM_options_str  += '<option value="CC du Plateau Picard">CC du Plateau Picard</option>';
+            NOM_options_str  += '<option value="CC du Plateau de Frasne et du Val du Drugeon (CFD)">CC du Plateau de Frasne et du Val du Drugeon (CFD)</option>';
+            NOM_options_str  += '<option value="CC du Plateau de Lannemezan">CC du Plateau de Lannemezan</option>';
+            NOM_options_str  += '<option value="CC du Plateau de Montbazens">CC du Plateau de Montbazens</option>';
+            NOM_options_str  += '<option value="CC du Plateau de Russey">CC du Plateau de Russey</option>';
+            NOM_options_str  += '<option value="CC du Pont du Gard">CC du Pont du Gard</option>';
+            NOM_options_str  += '<option value="CC du Provinois">CC du Provinois</option>';
+            NOM_options_str  += '<option value="CC du Périgord Nontronnais">CC du Périgord Nontronnais</option>';
+            NOM_options_str  += '<option value="CC du Périgord Ribéracois">CC du Périgord Ribéracois</option>';
+            NOM_options_str  += '<option value="CC du Quercy Blanc">CC du Quercy Blanc</option>';
+            NOM_options_str  += '<option value="CC du Quercy Caussadais">CC du Quercy Caussadais</option>';
+            NOM_options_str  += '<option value="CC du Quercy Rouergue et des Gorges de l&apos;Aveyron">CC du Quercy Rouergue et des Gorges de l&apos;Aveyron</option>';
+            NOM_options_str  += '<option value="CC du Rhône aux Gorges de l&apos;Ardèche">CC du Rhône aux Gorges de l&apos;Ardèche</option>';
+            NOM_options_str  += '<option value="CC du Ried de Marckolsheim">CC du Ried de Marckolsheim</option>';
+            NOM_options_str  += '<option value="CC du Romorantinais et du Monestois">CC du Romorantinais et du Monestois</option>';
+            NOM_options_str  += '<option value="CC du Rouillacais">CC du Rouillacais</option>';
+            NOM_options_str  += '<option value="CC du Royans-Vercors">CC du Royans-Vercors</option>';
+            NOM_options_str  += '<option value="CC du Réolais en Sud Gironde">CC du Réolais en Sud Gironde</option>';
+            NOM_options_str  += '<option value="CC du Réquistanais">CC du Réquistanais</option>';
+            NOM_options_str  += '<option value="CC du Sammiellois">CC du Sammiellois</option>';
+            NOM_options_str  += '<option value="CC du Sartenais Valinco Taravo">CC du Sartenais Valinco Taravo</option>';
+            NOM_options_str  += '<option value="CC du Saulnois">CC du Saulnois</option>';
+            NOM_options_str  += '<option value="CC du Saves">CC du Saves</option>';
+            NOM_options_str  += '<option value="CC du Seignanx">CC du Seignanx</option>';
+            NOM_options_str  += '<option value="CC du Serein">CC du Serein</option>';
+            NOM_options_str  += '<option value="CC du Sisteronais-Buëch">CC du Sisteronais-Buëch</option>';
+            NOM_options_str  += '<option value="CC du Sor et de l&apos;Agout">CC du Sor et de l&apos;Agout</option>';
+            NOM_options_str  += '<option value="CC du Sud">CC du Sud</option>';
+            NOM_options_str  += '<option value="CC du Sud Avesnois">CC du Sud Avesnois</option>';
+            NOM_options_str  += '<option value="CC du Sud Corse">CC du Sud Corse</option>';
+            NOM_options_str  += '<option value="CC du Sud Est Manceau">CC du Sud Est Manceau</option>';
+            NOM_options_str  += '<option value="CC du Sud Estuaire">CC du Sud Estuaire</option>';
+            NOM_options_str  += '<option value="CC du Sud Gironde">CC du Sud Gironde</option>';
+            NOM_options_str  += '<option value="CC du Sud Marnais">CC du Sud Marnais</option>';
+            NOM_options_str  += '<option value="CC du Sud Messin">CC du Sud Messin</option>';
+            NOM_options_str  += '<option value="CC du Sud Territoire">CC du Sud Territoire</option>';
+            NOM_options_str  += '<option value="CC du Sud-Artois">CC du Sud-Artois</option>';
+            NOM_options_str  += '<option value="CC du Ternois">CC du Ternois</option>';
+            NOM_options_str  += '<option value="CC du Territoire Nord Picardie">CC du Territoire Nord Picardie</option>';
+            NOM_options_str  += '<option value="CC du Territoire de Fresnes-en-Woëvre">CC du Territoire de Fresnes-en-Woëvre</option>';
+            NOM_options_str  += '<option value="CC du Territoire de Lunéville à Baccarat">CC du Territoire de Lunéville à Baccarat</option>';
+            NOM_options_str  += '<option value="CC du Thouarsais">CC du Thouarsais</option>';
+            NOM_options_str  += '<option value="CC du Triangle Vert">CC du Triangle Vert</option>';
+            NOM_options_str  += '<option value="CC du Trièves">CC du Trièves</option>';
+            NOM_options_str  += '<option value="CC du Val Marnaysien">CC du Val Marnaysien</option>';
+            NOM_options_str  += '<option value="CC du Val d&apos;Amboise">CC du Val d&apos;Amboise</option>';
+            NOM_options_str  += '<option value="CC du Val d&apos;Amour">CC du Val d&apos;Amour</option>';
+            NOM_options_str  += '<option value="CC du Val d&apos;Argent">CC du Val d&apos;Argent</option>';
+            NOM_options_str  += '<option value="CC du Val d&apos;Ay">CC du Val d&apos;Ay</option>';
+            NOM_options_str  += '<option value="CC du Val d&apos;Essonne (CCVE)">CC du Val d&apos;Essonne (CCVE)</option>';
+            NOM_options_str  += '<option value="CC du Val d&apos;Orne">CC du Val d&apos;Orne</option>';
+            NOM_options_str  += '<option value="CC du Val de Bouzanne">CC du Val de Bouzanne</option>';
+            NOM_options_str  += '<option value="CC du Val de Cher">CC du Val de Cher</option>';
+            NOM_options_str  += '<option value="CC du Val de Drôme en Biovallée">CC du Val de Drôme en Biovallée</option>';
+            NOM_options_str  += '<option value="CC du Val de Morteau">CC du Val de Morteau</option>';
+            NOM_options_str  += '<option value="CC du Val de Sarthe">CC du Val de Sarthe</option>';
+            NOM_options_str  += '<option value="CC du Val de Somme">CC du Val de Somme</option>';
+            NOM_options_str  += '<option value="CC du Val de Sully">CC du Val de Sully</option>';
+            NOM_options_str  += '<option value="CC du Val de Vienne">CC du Val de Vienne</option>';
+            NOM_options_str  += '<option value="CC du Val de l&apos;Aisne">CC du Val de l&apos;Aisne</option>';
+            NOM_options_str  += '<option value="CC du Val de l&apos;Eyre">CC du Val de l&apos;Eyre</option>';
+            NOM_options_str  += '<option value="CC du Val de l&apos;Oise">CC du Val de l&apos;Oise</option>';
+            NOM_options_str  += '<option value="CC du Vallespir">CC du Vallespir</option>';
+            NOM_options_str  += '<option value="CC du Vexin Normand">CC du Vexin Normand</option>';
+            NOM_options_str  += '<option value="CC du Vexin-Thelle">CC du Vexin-Thelle</option>';
+            NOM_options_str  += '<option value="CC du Vexin-Val de Seine">CC du Vexin-Val de Seine</option>';
+            NOM_options_str  += '<option value="CC du Vimeu">CC du Vimeu</option>';
+            NOM_options_str  += '<option value="CC du Volvestre">CC du Volvestre</option>';
+            NOM_options_str  += '<option value="CC du Warndt">CC du Warndt</option>';
+            NOM_options_str  += '<option value="CC entre Beauce et Perche">CC entre Beauce et Perche</option>';
+            NOM_options_str  += '<option value="CC interrégionale Aumale - Blangy-sur-Bresle">CC interrégionale Aumale - Blangy-sur-Bresle</option>';
+            NOM_options_str  += '<option value="CC l&apos;Orée de la Brie">CC l&apos;Orée de la Brie</option>';
+            NOM_options_str  += '<option value="CC rurales de l&apos;Entre-Deux-Mers">CC rurales de l&apos;Entre-Deux-Mers</option>';
+            NOM_options_str  += '<option value="CC Écueillé-Valençay">CC Écueillé-Valençay</option>';
+            NOM_options_str  += '<option value="CC Éguzon - Argenton - Vallée de la Creuse">CC Éguzon - Argenton - Vallée de la Creuse</option>';
+            NOM_options_str  += '<option value="CC Élan Limousin Avenir Nature">CC Élan Limousin Avenir Nature</option>';
+            NOM_options_str  += '<option value="CU Angers Loire Métropole">CU Angers Loire Métropole</option>';
+            NOM_options_str  += '<option value="CU Caen la Mer">CU Caen la Mer</option>';
+            NOM_options_str  += '<option value="CU Grand Besançon Métropole">CU Grand Besançon Métropole</option>';
+            NOM_options_str  += '<option value="CU Grand Paris Seine et Oise">CU Grand Paris Seine et Oise</option>';
+            NOM_options_str  += '<option value="CU Le Creusot Montceau-les-Mines">CU Le Creusot Montceau-les-Mines</option>';
+            NOM_options_str  += '<option value="CU Le Havre Seine Métropole">CU Le Havre Seine Métropole</option>';
+            NOM_options_str  += '<option value="CU Le Mans Métropole">CU Le Mans Métropole</option>';
+            NOM_options_str  += '<option value="CU Limoges Métropole">CU Limoges Métropole</option>';
+            NOM_options_str  += '<option value="CU Perpignan Méditerranée Métropole">CU Perpignan Méditerranée Métropole</option>';
+            NOM_options_str  += '<option value="CU d&apos;Alençon">CU d&apos;Alençon</option>';
+            NOM_options_str  += '<option value="CU d&apos;Arras">CU d&apos;Arras</option>';
+            NOM_options_str  += '<option value="CU de Dunkerque">CU de Dunkerque</option>';
+            NOM_options_str  += '<option value="CU du Grand Poitiers">CU du Grand Poitiers</option>';
+            NOM_options_str  += '<option value="CU du Grand Reims">CU du Grand Reims</option>';
+            NOM_options_str  += '<option value="Calvados">Calvados</option>';
+            NOM_options_str  += '<option value="Cantal">Cantal</option>';
+            NOM_options_str  += '<option value="Centre-Val de Loire">Centre-Val de Loire</option>';
+            NOM_options_str  += '<option value="Charente">Charente</option>';
+            NOM_options_str  += '<option value="Charente-Maritime">Charente-Maritime</option>';
+            NOM_options_str  += '<option value="Cher">Cher</option>';
+            NOM_options_str  += '<option value="Clermont Auvergne Métropole">Clermont Auvergne Métropole</option>';
+            NOM_options_str  += '<option value="Corrèze">Corrèze</option>';
+            NOM_options_str  += '<option value="Corse">Corse</option>';
+            NOM_options_str  += '<option value="Corse-du-Sud">Corse-du-Sud</option>';
+            NOM_options_str  += '<option value="Creuse">Creuse</option>';
+            NOM_options_str  += '<option value="Côte-d&apos;Or">Côte-d&apos;Or</option>';
+            NOM_options_str  += '<option value="Côtes-d&apos;Armor">Côtes-d&apos;Armor</option>';
+            NOM_options_str  += '<option value="Deux-Sèvres">Deux-Sèvres</option>';
+            NOM_options_str  += '<option value="Dijon Métropole">Dijon Métropole</option>';
+            NOM_options_str  += '<option value="Dordogne">Dordogne</option>';
+            NOM_options_str  += '<option value="Doubs">Doubs</option>';
+            NOM_options_str  += '<option value="Drôme">Drôme</option>';
+            NOM_options_str  += '<option value="Essonne">Essonne</option>';
+            NOM_options_str  += '<option value="Est Ensemble">Est Ensemble</option>';
+            NOM_options_str  += '<option value="Eure">Eure</option>';
+            NOM_options_str  += '<option value="Eure-et-Loir">Eure-et-Loir</option>';
+            NOM_options_str  += '<option value="Eurométropole de Strasbourg">Eurométropole de Strasbourg</option>';
+            NOM_options_str  += '<option value="Finistère">Finistère</option>';
+            NOM_options_str  += '<option value="Gard">Gard</option>';
+            NOM_options_str  += '<option value="Gers">Gers</option>';
+            NOM_options_str  += '<option value="Gironde">Gironde</option>';
+            NOM_options_str  += '<option value="Grand Est">Grand Est</option>';
+            NOM_options_str  += '<option value="Grand Paris Grand Est">Grand Paris Grand Est</option>';
+            NOM_options_str  += '<option value="Grand Paris Seine Ouest">Grand Paris Seine Ouest</option>';
+            NOM_options_str  += '<option value="Grand Paris Sud-Est Avenir">Grand Paris Sud-Est Avenir</option>';
+            NOM_options_str  += '<option value="Grand-Orly Seine Bièvre">Grand-Orly Seine Bièvre</option>';
+            NOM_options_str  += '<option value="Grenoble-Alpes-Métropole">Grenoble-Alpes-Métropole</option>';
+            NOM_options_str  += '<option value="Haut-Rhin">Haut-Rhin</option>';
+            NOM_options_str  += '<option value="Haute-Corse">Haute-Corse</option>';
+            NOM_options_str  += '<option value="Haute-Garonne">Haute-Garonne</option>';
+            NOM_options_str  += '<option value="Haute-Loire">Haute-Loire</option>';
+            NOM_options_str  += '<option value="Haute-Marne">Haute-Marne</option>';
+            NOM_options_str  += '<option value="Haute-Savoie">Haute-Savoie</option>';
+            NOM_options_str  += '<option value="Haute-Saône">Haute-Saône</option>';
+            NOM_options_str  += '<option value="Haute-Vienne">Haute-Vienne</option>';
+            NOM_options_str  += '<option value="Hautes-Alpes">Hautes-Alpes</option>';
+            NOM_options_str  += '<option value="Hautes-Pyrénées">Hautes-Pyrénées</option>';
+            NOM_options_str  += '<option value="Hauts-de-France">Hauts-de-France</option>';
+            NOM_options_str  += '<option value="Hauts-de-Seine">Hauts-de-Seine</option>';
+            NOM_options_str  += '<option value="Hérault">Hérault</option>';
+            NOM_options_str  += '<option value="Ille-et-Vilaine">Ille-et-Vilaine</option>';
+            NOM_options_str  += '<option value="Indre">Indre</option>';
+            NOM_options_str  += '<option value="Indre-et-Loire">Indre-et-Loire</option>';
+            NOM_options_str  += '<option value="Isère">Isère</option>';
+            NOM_options_str  += '<option value="Jura">Jura</option>';
+            NOM_options_str  += '<option value="Landes">Landes</option>';
+            NOM_options_str  += '<option value="Loir-et-Cher">Loir-et-Cher</option>';
+            NOM_options_str  += '<option value="Loire">Loire</option>';
+            NOM_options_str  += '<option value="Loire-Atlantique">Loire-Atlantique</option>';
+            NOM_options_str  += '<option value="Loiret">Loiret</option>';
+            NOM_options_str  += '<option value="Lot">Lot</option>';
+            NOM_options_str  += '<option value="Lot-et-Garonne">Lot-et-Garonne</option>';
+            NOM_options_str  += '<option value="Lozère">Lozère</option>';
+            NOM_options_str  += '<option value="Maine-et-Loire">Maine-et-Loire</option>';
+            NOM_options_str  += '<option value="Manche">Manche</option>';
+            NOM_options_str  += '<option value="Marne">Marne</option>';
+            NOM_options_str  += '<option value="Mayenne">Mayenne</option>';
+            NOM_options_str  += '<option value="Metz Métropole">Metz Métropole</option>';
+            NOM_options_str  += '<option value="Meurthe-et-Moselle">Meurthe-et-Moselle</option>';
+            NOM_options_str  += '<option value="Meuse">Meuse</option>';
+            NOM_options_str  += '<option value="Montpellier Méditerranée Métropole">Montpellier Méditerranée Métropole</option>';
+            NOM_options_str  += '<option value="Morbihan">Morbihan</option>';
+            NOM_options_str  += '<option value="Moselle">Moselle</option>';
+            NOM_options_str  += '<option value="Métropole Européenne de Lille">Métropole Européenne de Lille</option>';
+            NOM_options_str  += '<option value="Métropole Nice Côte d&apos;Azur">Métropole Nice Côte d&apos;Azur</option>';
+            NOM_options_str  += '<option value="Métropole Rouen Normandie">Métropole Rouen Normandie</option>';
+            NOM_options_str  += '<option value="Métropole Toulon-Provence-Méditerranée">Métropole Toulon-Provence-Méditerranée</option>';
+            NOM_options_str  += '<option value="Métropole d&apos;Aix-Marseille-Provence">Métropole d&apos;Aix-Marseille-Provence</option>';
+            NOM_options_str  += '<option value="Métropole de Lyon">Métropole de Lyon</option>';
+            NOM_options_str  += '<option value="Métropole du Grand Nancy">Métropole du Grand Nancy</option>';
+            NOM_options_str  += '<option value="Métropole du Grand Paris">Métropole du Grand Paris</option>';
+            NOM_options_str  += '<option value="Nantes Métropole">Nantes Métropole</option>';
+            NOM_options_str  += '<option value="Nièvre">Nièvre</option>';
+            NOM_options_str  += '<option value="Nord">Nord</option>';
+            NOM_options_str  += '<option value="Normandie">Normandie</option>';
+            NOM_options_str  += '<option value="Nouvelle-Aquitaine">Nouvelle-Aquitaine</option>';
+            NOM_options_str  += '<option value="Occitanie">Occitanie</option>';
+            NOM_options_str  += '<option value="Oise">Oise</option>';
+            NOM_options_str  += '<option value="Orléans Métropole">Orléans Métropole</option>';
+            NOM_options_str  += '<option value="Orne">Orne</option>';
+            NOM_options_str  += '<option value="Paris">Paris</option>';
+            NOM_options_str  += '<option value="Paris Est Marne et Bois">Paris Est Marne et Bois</option>';
+            NOM_options_str  += '<option value="Paris Ouest La Défense">Paris Ouest La Défense</option>';
+            NOM_options_str  += '<option value="Paris Terres d&apos;Envol">Paris Terres d&apos;Envol</option>';
+            NOM_options_str  += '<option value="Pas-de-Calais">Pas-de-Calais</option>';
+            NOM_options_str  += '<option value="Pays de la Loire">Pays de la Loire</option>';
+            NOM_options_str  += '<option value="Plaine Commune">Plaine Commune</option>';
+            NOM_options_str  += '<option value="Provence-Alpes-Côte d&apos;Azur">Provence-Alpes-Côte d&apos;Azur</option>';
+            NOM_options_str  += '<option value="Puy-de-Dôme">Puy-de-Dôme</option>';
+            NOM_options_str  += '<option value="Pyrénées-Atlantiques">Pyrénées-Atlantiques</option>';
+            NOM_options_str  += '<option value="Pyrénées-Orientales">Pyrénées-Orientales</option>';
+            NOM_options_str  += '<option value="Rennes Métropole">Rennes Métropole</option>';
+            NOM_options_str  += '<option value="Rhône">Rhône</option>';
+            NOM_options_str  += '<option value="Saint-Etienne Métropole">Saint-Etienne Métropole</option>';
+            NOM_options_str  += '<option value="Sarthe">Sarthe</option>';
+            NOM_options_str  += '<option value="Savoie">Savoie</option>';
+            NOM_options_str  += '<option value="Saône-et-Loire">Saône-et-Loire</option>';
+            NOM_options_str  += '<option value="Seine-Maritime">Seine-Maritime</option>';
+            NOM_options_str  += '<option value="Seine-Saint-Denis">Seine-Saint-Denis</option>';
+            NOM_options_str  += '<option value="Seine-et-Marne">Seine-et-Marne</option>';
+            NOM_options_str  += '<option value="Somme">Somme</option>';
+            NOM_options_str  += '<option value="Tarn">Tarn</option>';
+            NOM_options_str  += '<option value="Tarn-et-Garonne">Tarn-et-Garonne</option>';
+            NOM_options_str  += '<option value="Territoire de Belfort">Territoire de Belfort</option>';
+            NOM_options_str  += '<option value="Toulouse Métropole">Toulouse Métropole</option>';
+            NOM_options_str  += '<option value="Tours Métropole Val de Loire">Tours Métropole Val de Loire</option>';
+            NOM_options_str  += '<option value="Val-d&apos;Oise">Val-d&apos;Oise</option>';
+            NOM_options_str  += '<option value="Val-de-Marne">Val-de-Marne</option>';
+            NOM_options_str  += '<option value="Vallée Sud-Grand Paris">Vallée Sud-Grand Paris</option>';
+            NOM_options_str  += '<option value="Var">Var</option>';
+            NOM_options_str  += '<option value="Vaucluse">Vaucluse</option>';
+            NOM_options_str  += '<option value="Vendée">Vendée</option>';
+            NOM_options_str  += '<option value="Vienne">Vienne</option>';
+            NOM_options_str  += '<option value="Vosges">Vosges</option>';
+            NOM_options_str  += '<option value="Yonne">Yonne</option>';
+            NOM_options_str  += '<option value="Yvelines">Yvelines</option>';
+            NOM_options_str  += '<option value="Île-de-France">Île-de-France</option>';
+            sel_NOM.innerHTML = NOM_options_str;
+            div_NOM.appendChild(sel_NOM);
+            var lab_NOM = document.createElement('div');
+            lab_NOM.innerHTML = 'NOM';
+            lab_NOM.className = 'filterlabel';
+            div_NOM.appendChild(lab_NOM);
+            var reset_NOM = document.createElement('div');
+            reset_NOM.innerHTML = 'clear filter';
+            reset_NOM.className = 'filterlabel';
+            reset_NOM.onclick = function() {
+                var options = document.getElementById("sel_NOM").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_NOM.appendChild(reset_NOM);
+        </script>
+    </body>
+</html>
